@@ -16,7 +16,7 @@ usage is controlling interactive programs in system tests.
 ## Installation
 
 ```shell-session
-$ composer require [--dev] rjkip/expecto
+$ composer require --dev rjkip/expecto
 ```
 
 ## API
