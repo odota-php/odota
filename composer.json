@@ -1,0 +1,28 @@
+{
+    "name": "rjkip/expecto",
+    "description": "Programmed dialogue with interactive programs for PHP",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Reinier Kip",
+            "email": "dev@rjkip.nl"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Expecto\\Expecto\\": "src"
+        },
+        "files": ["src/assert.php", "src/expecto.php"]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Expecto\\Expecto\\IntegrationTest\\": "tests/integration"
+        },
+        "files": ["vendor/phpunit/phpunit/src/Framework/Assert/Functions.php"]
+    },
+    "minimum-stability": "stable",
+    "require-dev": {
+        "phpunit/phpunit": "^5.4"
+    }
+}
