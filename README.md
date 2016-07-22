@@ -13,7 +13,7 @@ Programmed dialogue with interactive programs.
 $ composer require [--dev] rjkip/expecto
 ```
 
-## Usages
+## API
 
 Examples explain it all.
 

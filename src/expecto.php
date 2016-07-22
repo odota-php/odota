@@ -6,7 +6,7 @@ namespace Expecto\Expecto;
  * @param string        $command
  * @param string|null   $workingDirectory
  * @param string[]|null $environmentVariables
- * @return Interacter
+ * @return Program
  */
 function program($command, $workingDirectory = null, array $environmentVariables = null)
 {
