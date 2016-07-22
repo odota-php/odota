@@ -15,42 +15,6 @@ function assertIsResource($stream, $message)
 }
 
 /**
- * @param resource $stream
- * @param string   $message
- * @throws InvalidArgumentException
- */
-function assertStreamIsReadable($stream, $message)
-{
-    if (!is_resource($stream)) {
-        throw InvalidArgumentException::format('Stream must be a stream, got type "%s"', gettype($stream));
-    }
-
-    $metadata = stream_get_meta_data($stream);
-
-    if (!in_array($metadata['mode'], ['r', 'r+', 'w+', 'a+', 'x+', 'c+'])) {
-        throw InvalidArgumentException::format($message, $metadata['mode']);
-    }
-}
-
-/**
- * @param resource $stream
- * @param string   $message
- * @throws InvalidArgumentException
- */
-function assertStreamIsWritable($stream, $message)
-{
-    if (!is_resource($stream)) {
-        throw InvalidArgumentException::format('Stream must be a stream, got type "%s"', gettype($stream));
-    }
-
-    $metadata = stream_get_meta_data($stream);
-
-    if (!in_array($metadata['mode'], ['r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'])) {
-        throw InvalidArgumentException::format($message, $metadata['mode']);
-    }
-}
-
-/**
  * @param mixed  $value
  * @param string $message
  * @throws InvalidArgumentException

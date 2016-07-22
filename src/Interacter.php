@@ -52,9 +52,6 @@ final class Interacter
         assertIsResource($stdout, 'Expected program\'s stdout to be a resource, got type "%s"');
         assertIsResource($stderr, 'Expected program\'s stderr to be a resource, got type "%s"');
         assertIsResource($stdin, 'Expected program\'s stdin to be a resource, got type "%s"');
-        assertStreamIsReadable($stdout, 'Expected program\'s stdout to be readable, got mode "%s"');
-        assertStreamIsReadable($stderr, 'Expected program\'s stderr to be readable, got mode "%s"');
-        assertStreamIsWritable($stdin, 'Expected program\'s stdin to be writable, got mode "%s"');
 
         return new Interacter($handle, $stdout, $stderr, $stdin);
     }
