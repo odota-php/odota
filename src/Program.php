@@ -200,6 +200,29 @@ final class Program
     }
 
     /**
+     * @param int|null $expectedExitCode
+     * @throws RuntimeException When the program's exit code is not 0
+     * @throws ExpectationTimedOutException
+     */
+    public function failure($expectedExitCode = null)
+    {
+        assertIntegerOrNull($expectedExitCode, 'Expected expected exit code to be an integer or null');
+
+        $actualExitCode = $this->wait();
+
+        if ($expectedExitCode === null && $actualExitCode === 0) {
+            throw RuntimeException::format('Expected program to exit with a non-zero exit code, got exit code 0');
+        }
+        if ($expectedExitCode !== null && $expectedExitCode !== $actualExitCode) {
+            throw RuntimeException::format(
+                'Expected program to exit with exit code %d, got exit code %d',
+                $expectedExitCode,
+                $actualExitCode
+            );
+        }
+    }
+
+    /**
      * @throws ExpectationTimedOutException
      */
     private function wait()

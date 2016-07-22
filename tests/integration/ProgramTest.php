@@ -117,4 +117,50 @@ class ProgramTest extends TestCase
             );
         }
     }
+
+    /** @test */
+    public function assert_program_exits_with_an_nonzero_exit_code()
+    {
+        program('exit 1')
+            ->failure();
+    }
+
+    /** @test */
+    public function throws_an_exception_when_program_unexpectedly_succeeds()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Expected program to exit with a non-zero exit code, got exit code 0');
+
+        program('echo OK')
+            ->failure();
+    }
+
+    /** @test */
+    public function assert_program_exits_with_a_certain_exit_code()
+    {
+        program('exit 2')
+            ->failure(2);
+    }
+
+    /** @test */
+    public function throws_an_exception_when_program_exits_with_other_exit_code()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Expected program to exit with exit code 2, got exit code 1');
+
+        program('exit 1')
+            ->failure(2);
+    }
+
+    /** @test */
+    public function stdout_stderr_mix()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
+    public function negative_timeout_after()
+    {
+        $this->markTestIncomplete();
+    }
 }
