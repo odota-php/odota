@@ -11,8 +11,8 @@ class ProgramTest extends TestCase
     /** @test */
     public function can_expect_a_string_after_some_sleep()
     {
-        program('sleep 0.005 && echo YAY')
-            ->timeoutAfter(0.010)
+        program('sleep 0.100 && echo YAY')
+            ->timeoutAfter(0.200)
             ->expect('YAY');
     }
 
@@ -20,8 +20,8 @@ class ProgramTest extends TestCase
     public function can_time_out_while_expecting_a_string()
     {
         $this->expectException(ExpectationTimedOutException::class);
-        program('sleep 0.010 && echo YAY')
-            ->timeoutAfter(0.005)
+        program('sleep 0.100 && echo YAY')
+            ->timeoutAfter(0.050)
             ->expect('YAY');
     }
 
@@ -46,7 +46,6 @@ class ProgramTest extends TestCase
     {
         try {
             program('echo -n " > "; read name; echo "Hello, $name!"')
-                ->timeoutAfter(0.010)
                 ->expect(' > ')
                 ->sendln('Bob')
                 ->expect('Hello, world!');
@@ -67,7 +66,6 @@ class ProgramTest extends TestCase
     public function can_expect_a_string_in_two_parts_even_though_its_all_in_the_buffer_already()
     {
         program('echo AZ')
-            ->timeoutAfter(0.010)
             ->expect('A')
             ->expect('Z');
     }
