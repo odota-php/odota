@@ -1,7 +1,13 @@
 Expecto
 =======
 
-Programmed dialogue with interactive programs.
+Programmed dialogue with interactive programs. A very basic alternative to the
+[`expect` command-line tool][man-expect] (Don Libes, NIST) and the
+[`expect` PHP extension][php-expect] written in user-land PHP. Its intended
+usage is controlling interactive programs in system tests.
+
+[man-expect]: http://linux.die.net/man/1/expect
+[php-expect]: http://php.net/manual/en/book.expect.php
 
 | Branch  | Build status |
 |---------|--------------|
