@@ -186,8 +186,73 @@ final class Program
         return $this;
     }
 
+    /**
+     * @throws RuntimeException When the program's exit code is not 0
+     * @throws ExpectationTimedOutException
+     */
+    public function success()
+    {
+        $exitCode = $this->wait();
+
+        if ($exitCode !== 0) {
+            throw RuntimeException::format('Expected program to exit successfully, got exit code %d', $exitCode);
+        }
+    }
+
+    /**
+     * @throws ExpectationTimedOutException
+     */
+    private function wait()
+    {
+        $start = microtime(true);
+
+        while (true) {
+            $timeLeft = $this->timeout - (microtime(true) - $start);
+
+            if ($timeLeft <= 0) {
+
+                $this->terminate();
+
+                throw new ExpectationTimedOutException(
+                    sprintf(
+                        'Program did not terminate within %.3f seconds',
+                        $this->timeout
+                    ),
+                    $this->buffer
+                );
+            }
+
+            $read     = [$this->stdout, $this->stderr];
+            $write    = [];
+            $except   = [];
+            $readable = stream_select($read, $write, $except, 0, min($timeLeft*1000*1000, 0.100*1000*1000));
+
+            if ($readable === false) {
+                throw RuntimeException::format('Stream select error: "%s"', error_get_last()['message']);
+            }
+
+            $status = proc_get_status($this->handle);
+
+            if ($status['exitcode'] === -1) {
+                continue;
+            }
+
+            return $status['exitcode'];
+        }
+
+        throw LogicException::format('Should be unreachable code');
+    }
+
+    private function terminate()
+    {
+        @fclose($this->stdin);
+        @fclose($this->stdout);
+        @fclose($this->stderr);
+        @proc_terminate($this->handle);
+    }
+
     public function __destruct()
     {
-        proc_close($this->handle);
+        $this->terminate();
     }
 }
