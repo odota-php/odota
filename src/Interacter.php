@@ -177,6 +177,6 @@ final class Interacter
 
     public function __destruct()
     {
-        @fclose($this->handle);
+        proc_close($this->handle);
     }
 }
