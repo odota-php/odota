@@ -65,12 +65,12 @@ final class Program
      */
     private function __construct($handle, $stdout, $stderr, $stdin)
     {
-        $this->handle         = $handle;
-        $this->stdout         = $stdout;
-        $this->stderr         = $stderr;
-        $this->stdin          = $stdin;
-        $this->buffer         = '';
-        $this->timeout        = self::DEFAULT_TIMEOUT;
+        $this->handle  = $handle;
+        $this->stdout  = $stdout;
+        $this->stderr  = $stderr;
+        $this->stdin   = $stdin;
+        $this->buffer  = '';
+        $this->timeout = self::DEFAULT_TIMEOUT;
     }
 
     /**
@@ -136,7 +136,7 @@ final class Program
             $read     = [$this->$stream];
             $write    = [];
             $except   = [];
-            $readable = stream_select($read, $write, $except, 0, $timeLeft*1000*1000);
+            $readable = stream_select($read, $write, $except, 0, $timeLeft * 1000 * 1000);
 
             if ($readable === false) {
                 throw RuntimeException::format('Stream select error: "%s"', error_get_last()['message']);
@@ -248,7 +248,7 @@ final class Program
             $read     = [$this->stdout, $this->stderr];
             $write    = [];
             $except   = [];
-            $readable = stream_select($read, $write, $except, 0, min($timeLeft*1000*1000, 0.100*1000*1000));
+            $readable = stream_select($read, $write, $except, 0, min($timeLeft * 1000 * 1000, 0.100 * 1000 * 1000));
 
             if ($readable === false) {
                 throw RuntimeException::format('Stream select error: "%s"', error_get_last()['message']);
