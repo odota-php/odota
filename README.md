@@ -43,4 +43,8 @@ program('sleep 2; echo OK')
 ## Platform support
 
 Expecto has been written on and tested on Ubuntu systems. While it ought to
-work on all Linux systems, and also on Windows and Mac OS, this is not tested.
+work on all Linux systems and Mac OS, this is not tested. Windows is not
+supported, because the use of `stream_select()` on file descriptors returned by
+`proc_open()` [will fail][php-stream-select] and return `false` under Windows.
+
+[php-stream-select]: http://php.net/manual/en/function.stream-select.php
