@@ -39,3 +39,8 @@ program('sleep 2; echo OK')
     ->expect('OK');
 // Expecto\Expecto\ExpectationTimedOutException
 ```
+
+## Platform support
+
+Expecto has been written on and tested on Ubuntu systems. While it ought to
+work on all Linux systems, and also on Windows and Mac OS, this is not tested.
