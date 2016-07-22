@@ -21,7 +21,7 @@ final class Program
     /** @var string */
     private $buffer;
     /** @var float */
-    private $defaultTimeout;
+    private $timeout;
 
     /**
      * @param string        $command
@@ -70,7 +70,7 @@ final class Program
         $this->stderr         = $stderr;
         $this->stdin          = $stdin;
         $this->buffer         = '';
-        $this->defaultTimeout = self::DEFAULT_TIMEOUT;
+        $this->timeout        = self::DEFAULT_TIMEOUT;
     }
 
     /**
@@ -81,51 +81,45 @@ final class Program
     {
         assertFloaty($seconds, 'Expected time-out to be a float, got "%s" of type "%s"');
 
-        $this->defaultTimeout = $seconds;
+        $this->timeout = $seconds;
 
         return $this;
     }
 
     /**
-     * @param string         $expected
-     * @param float|int|null $timeout
+     * @param string $expected
      * @return $this
      */
-    public function expect($expected, $timeout = null)
+    public function expect($expected)
     {
-        $this->expectFromStream('stdout', $expected, $timeout);
+        $this->expectFromStream('stdout', $expected);
 
         return $this;
     }
 
     /**
-     * @param string         $expected
-     * @param float|int|null $timeout
+     * @param string $expected
      * @return static
      */
-    public function expectError($expected, $timeout = null)
+    public function expectError($expected)
     {
-        $this->expectFromStream('stderr', $expected, $timeout);
+        $this->expectFromStream('stderr', $expected);
 
         return $this;
     }
 
     /**
-     * @param string         $stream
-     * @param string         $expected
-     * @param float|int|null $timeout
+     * @param string $stream
+     * @param string $expected
      */
-    private function expectFromStream($stream, $expected, $timeout = null)
+    private function expectFromStream($stream, $expected)
     {
-        $timeout = $timeout === null ? $this->defaultTimeout : $timeout;
-
         assertString($expected, 'Expected expected string to be a string, got "%s" of type "%s"');
-        assertFloaty($timeout, 'Expected time-out to be a float, got "%s" of type "%s"');
 
         $start = microtime(true);
 
         while (true) {
-            $timeLeft = $timeout - (microtime(true) - $start);
+            $timeLeft = $this->timeout - (microtime(true) - $start);
 
             if ($timeLeft <= 0) {
                 throw new ExpectationTimedOutException(
@@ -133,7 +127,7 @@ final class Program
                         'Stream "%s" did not output expected string "%s" within %.3f seconds',
                         $stream,
                         $expected,
-                        $timeout
+                        $this->timeout
                     ),
                     $this->buffer
                 );
