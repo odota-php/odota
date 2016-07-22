@@ -31,13 +31,18 @@ program('echo -n " > "; read name; sleep 2; echo "Hello, $name!"')
     ->expect(' > ')
     ->sendln('Bob')
     ->timeoutAfter(3)
-    ->expect('Hello, Bob!');
+    ->expect('Hello, Bob!')
+    ->success();
 
 // Expectation time-outs default to 100ms, but can be adjusted.
 program('sleep 2; echo OK')
     ->timeoutAfter(1)
     ->expect('OK');
 // Expecto\Expecto\ExpectationTimedOutException
+
+// Expect programs to fail.
+program('test -e non-existent-file')
+    ->failure();
 ```
 
 ## Platform support
