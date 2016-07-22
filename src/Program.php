@@ -136,7 +136,7 @@ final class Program
             $read     = [$this->$stream];
             $write    = [];
             $except   = [];
-            $readable = stream_select($read, $write, $except, 0, $timeLeft);
+            $readable = stream_select($read, $write, $except, 0, $timeLeft*1000*1000);
 
             if ($readable === false) {
                 throw RuntimeException::format('Stream select error: "%s"', error_get_last()['message']);
