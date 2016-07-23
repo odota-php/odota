@@ -31,7 +31,7 @@ final class Program
      */
     public static function interactWith($command, $workingDirectory = null, array $environmentVariables = null)
     {
-        $workingDirectory     = $workingDirectory ?: getcwd();
+        $workingDirectory = $workingDirectory ?: getcwd();
         $environmentVariables = $environmentVariables ?: [];
 
         assertNonBlankString(
@@ -65,10 +65,10 @@ final class Program
      */
     private function __construct($handle, Buffer $stdout, Buffer $stderr, $stdin)
     {
-        $this->handle  = $handle;
-        $this->stdout  = $stdout;
-        $this->stderr  = $stderr;
-        $this->stdin   = $stdin;
+        $this->handle = $handle;
+        $this->stdout = $stdout;
+        $this->stderr = $stderr;
+        $this->stdin = $stdin;
         $this->bufferStdout = '';
         $this->bufferStderr = '';
         $this->timeout = self::DEFAULT_TIMEOUT;
@@ -248,9 +248,9 @@ final class Program
                 );
             }
 
-            $read     = [$this->stdout->getStream(), $this->stderr->getStream()];
-            $write    = [];
-            $except   = [];
+            $read = [$this->stdout->getStream(), $this->stderr->getStream()];
+            $write = [];
+            $except = [];
             $readable = stream_select($read, $write, $except, 0, min($timeLeft * 1000 * 1000, 0.100 * 1000 * 1000));
 
             if ($readable === false) {
