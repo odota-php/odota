@@ -188,4 +188,16 @@ class ProgramTest extends TestCase
         program('echo OK')
             ->timeoutAfter(-1);
     }
+
+    /** @test */
+    public function timed_out_exception_contains_string_that_remains_in_buffer()
+    {
+        try {
+            program('echo -n NAY')
+                ->timeoutAfter(0.050)
+                ->expect('YAY');
+        } catch (ExpectationTimedOutException $e) {
+            assertSame('NAY', $e->getRemainingInBuffer());
+        }
+    }
 }
