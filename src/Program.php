@@ -83,6 +83,9 @@ final class Program
     public function timeoutAfter($seconds)
     {
         assertFloaty($seconds, 'Expected time-out to be a float, got "%s" of type "%s"');
+        if ($seconds <= 0) {
+            throw InvalidArgumentException::format('Time-out must be greater than zero, got %f', $seconds);
+        }
 
         $this->timeout = $seconds;
 

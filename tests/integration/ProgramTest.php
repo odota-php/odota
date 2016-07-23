@@ -3,6 +3,7 @@
 namespace Expect\Expect\IntegrationTest;
 
 use Expect\Expect\ExpectationTimedOutException;
+use Expect\Expect\InvalidArgumentException;
 use Expect\Expect\RuntimeException;
 use PHPUnit\Framework\TestCase as TestCase;
 use function Expect\Expect\program;
@@ -159,5 +160,32 @@ class ProgramTest extends TestCase
             ->expect('A')
             ->expectError('B')
             ->expect('C');
+    }
+
+    /** @test */
+    public function allows_expecting_from_stdout_and_stderr_out_of_order()
+    {
+        program('echo AC; echo B >&2')
+            ->expect('A')
+            ->expectError('B')
+            ->expect('C');
+    }
+
+    /** @test */
+    public function timeout_must_be_greater_than_zero()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('greater than zero');
+        program('echo OK')
+            ->timeoutAfter(0);
+    }
+
+    /** @test */
+    public function timeout_may_not_be_negative()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('greater than zero');
+        program('echo OK')
+            ->timeoutAfter(-1);
     }
 }
