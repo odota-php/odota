@@ -1,6 +1,10 @@
 <?php
 
-namespace Expect\Expect;
+namespace Expect\Expect\Buffer;
+
+use function Expect\Expect\assertIsResource;
+use Expect\Expect\Buffer;
+use Expect\Expect\Matcher;
 
 final class StreamBuffer implements Buffer
 {

@@ -2,6 +2,7 @@
 
 namespace Expect\Expect;
 
+use Expect\Expect\Buffer\StreamBuffer;
 use Expect\Expect\Matcher\ExactMatcher;
 
 final class Program
