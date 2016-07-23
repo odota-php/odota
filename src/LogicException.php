@@ -1,6 +1,6 @@
 <?php
 
-namespace Expecto\Expecto;
+namespace Expect\Expect;
 
 class LogicException extends \LogicException
 {

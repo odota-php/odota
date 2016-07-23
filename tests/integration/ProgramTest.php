@@ -1,11 +1,11 @@
 <?php
 
-namespace Expecto\Expecto\IntegrationTest;
+namespace Expect\Expect\IntegrationTest;
 
-use Expecto\Expecto\ExpectationTimedOutException;
-use Expecto\Expecto\RuntimeException;
+use Expect\Expect\ExpectationTimedOutException;
+use Expect\Expect\RuntimeException;
 use PHPUnit\Framework\TestCase as TestCase;
-use function Expecto\Expecto\program;
+use function Expect\Expect\program;
 
 class ProgramTest extends TestCase
 {
@@ -50,7 +50,7 @@ class ProgramTest extends TestCase
                 ->expect(' > ')
                 ->sendln('Bob')
                 ->expect('Hello, world!');
-            $this->fail('Expecto ought to have timed out waiting for "Hello, world!"');
+            $this->fail('Expect ought to have timed out waiting for "Hello, world!"');
         } catch (ExpectationTimedOutException $e) {
             assertContains(
                 'Hello, Bob!',
@@ -108,7 +108,7 @@ class ProgramTest extends TestCase
         $elapsed = $end - $start;
 
         if ($elapsed > 0.150) {
-            // In case somehow Expecto waited for sleep to exit after 1 second.
+            // In case somehow Expect waited for sleep to exit after 1 second.
             $this->fail(
                 sprintf(
                     'Waiting for program exit ought to have timed out after 100ms, but it took %.3f seconds',

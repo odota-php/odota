@@ -1,5 +1,5 @@
 {
-    "name": "rjkip/expecto",
+    "name": "expectphp/expect",
     "description": "Programmed dialogue with interactive programs for PHP",
     "type": "library",
     "license": "MIT",
@@ -11,13 +11,13 @@
     ],
     "autoload": {
         "psr-4": {
-            "Expecto\\Expecto\\": "src"
+            "Expect\\Expect\\": "src"
         },
-        "files": ["src/assert.php", "src/expecto.php"]
+        "files": ["src/assert.php", "src/expect.php"]
     },
     "autoload-dev": {
         "psr-4": {
-            "Expecto\\Expecto\\IntegrationTest\\": "tests/integration"
+            "Expect\\Expect\\IntegrationTest\\": "tests/integration"
         },
         "files": ["vendor/phpunit/phpunit/src/Framework/Assert/Functions.php"]
     },

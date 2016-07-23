@@ -1,5 +1,5 @@
-Expecto
-=======
+Expect
+======
 
 Programmed dialogue with interactive programs. A very basic alternative to the
 [`expect` command-line tool][man-expect] (Don Libes, NIST) and the
@@ -11,12 +11,12 @@ usage is controlling interactive programs in system tests.
 
 | Branch  | Build status |
 |---------|--------------|
-| develop | [![Travis](https://travis-ci.org/rjkip/expecto.svg?branch=develop)](https://travis-ci.org/rjkip/expecto) |
+| develop | [![Travis](https://travis-ci.org/expectphp/expect.svg?branch=develop)](https://travis-ci.org/expectphp/expect) |
 
 ## Installation
 
 ```shell-session
-$ composer require --dev rjkip/expecto
+$ composer require --dev expectphp/expect
 ```
 
 ## API
@@ -24,7 +24,7 @@ $ composer require --dev rjkip/expecto
 Examples explain it all.
 
 ```php
-use function Expecto\Expecto\program;
+use function Expect\Expect\program;
 
 // Programmed dialogue with an interactive program.
 program('echo -n " > "; read name; sleep 2; echo "Hello, $name!"')
@@ -38,7 +38,7 @@ program('echo -n " > "; read name; sleep 2; echo "Hello, $name!"')
 program('sleep 2; echo OK')
     ->timeoutAfter(1)
     ->expect('OK');
-// Expecto\Expecto\ExpectationTimedOutException
+// Expect\Expect\ExpectationTimedOutException
 
 // Expect programs to fail.
 program('test -e non-existent-file')
@@ -47,7 +47,7 @@ program('test -e non-existent-file')
 
 ## Platform support
 
-Expecto has been written on and tested on Ubuntu systems. While it ought to
+Expect has been written on and tested on Ubuntu systems. While it ought to
 work on all Linux systems and Mac OS, this is not tested. Windows is not
 supported, because the use of `stream_select()` on file descriptors returned by
 `proc_open()` [will fail][php-stream-select] and return `false` under Windows.
