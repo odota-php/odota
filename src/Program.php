@@ -235,9 +235,6 @@ final class Program
             $timeLeft = $this->timeout - (microtime(true) - $start);
 
             if ($timeLeft <= 0) {
-
-                $this->terminate();
-
                 throw new ExpectationTimedOutException(
                     sprintf(
                         'Program did not terminate within %.3f seconds',
@@ -274,10 +271,10 @@ final class Program
 
     private function terminate()
     {
-        @fclose($this->stdin);
-        @$this->stdout->close();
-        @$this->stderr->close();
-        @proc_terminate($this->handle);
+        fclose($this->stdin);
+        $this->stdout->close();
+        $this->stderr->close();
+        proc_terminate($this->handle);
     }
 
     public function __destruct()
