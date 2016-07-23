@@ -2,6 +2,8 @@
 
 namespace Expect\Expect;
 
+use Expect\Expect\Matcher\ExactMatcher;
+
 final class Program
 {
     /**
@@ -12,16 +14,12 @@ final class Program
 
     /** @var resource */
     private $handle;
-    /** @var resource */
+    /** @var Buffer */
     private $stdout;
-    /** @var resource */
+    /** @var Buffer */
     private $stderr;
     /** @var resource */
     private $stdin;
-    /** @var string */
-    private $bufferStdout;
-    /** @var string */
-    private $bufferStderr;
     /** @var float */
     private $timeout;
 
@@ -56,16 +54,16 @@ final class Program
         stream_set_blocking($pipes[1], 0);
         stream_set_blocking($pipes[2], 0);
 
-        return new Program($process, $pipes[1], $pipes[2], $pipes[0]);
+        return new Program($process, new StreamBuffer($pipes[1]), new StreamBuffer($pipes[2]), $pipes[0]);
     }
 
     /**
      * @param resource $handle
-     * @param resource $stdout
-     * @param resource $stderr
+     * @param Buffer   $stdout
+     * @param Buffer   $stderr
      * @param resource $stdin
      */
-    private function __construct($handle, $stdout, $stderr, $stdin)
+    private function __construct($handle, Buffer $stdout, Buffer $stderr, $stdin)
     {
         $this->handle  = $handle;
         $this->stdout  = $stdout;
@@ -98,7 +96,9 @@ final class Program
      */
     public function expect($expected)
     {
-        $this->expectFromStream('stdout', $expected);
+        assertString($expected, 'Expected expected string to be a string, got "%s" of type "%s"');
+
+        $this->expectFromStream('stdout', new ExactMatcher($expected));
 
         return $this;
     }
@@ -109,26 +109,23 @@ final class Program
      */
     public function expectError($expected)
     {
-        $this->expectFromStream('stderr', $expected);
+        assertString($expected, 'Expected expected string to be a string, got "%s" of type "%s"');
+
+        $this->expectFromStream('stderr', new ExactMatcher($expected));
 
         return $this;
     }
 
     /**
-     * @param string $stream
-     * @param string $expected
+     * @param string  $stream
+     * @param Matcher $matcher
      */
-    private function expectFromStream($stream, $expected)
+    private function expectFromStream($stream, Matcher $matcher)
     {
-        assertString($expected, 'Expected expected string to be a string, got "%s" of type "%s"');
+        /** @var Buffer $buffer */
+        $buffer = &$this->$stream;
 
         $start = microtime(true);
-
-        if ($stream === 'stdout') {
-            $buffer = &$this->bufferStdout;
-        } else {
-            $buffer = &$this->bufferStderr;
-        }
 
         while (true) {
             $timeLeft = $this->timeout - (microtime(true) - $start);
@@ -136,18 +133,18 @@ final class Program
             if ($timeLeft <= 0) {
                 throw new ExpectationTimedOutException(
                     sprintf(
-                        'Stream "%s" did not output expected string "%s" within %.3f seconds',
+                        'Stream "%s" did not output expected "%s" within %.3f seconds',
                         $stream,
-                        $expected,
+                        $matcher,
                         $this->timeout
                     ),
-                    $buffer
+                    $buffer->getContents()
                 );
             }
 
-            $read     = [$this->$stream];
-            $write    = [];
-            $except   = [];
+            $read = [$buffer->getStream()];
+            $write = [];
+            $except = [];
             $readable = stream_select($read, $write, $except, 0, $timeLeft * 1000 * 1000);
 
             if ($readable === false) {
@@ -156,19 +153,12 @@ final class Program
                 continue;
             }
 
-            do {
-                $bytes = fread($this->$stream, 4096);
-                $buffer .= $bytes;
-            } while ($bytes !== '');
+            $buffer->read();
+            $bytesMatched = $buffer->matchAndDrop($matcher);
 
-            $position = strpos($buffer, $expected);
-            if ($position === false) {
-                continue;
+            if ($bytesMatched > 0) {
+                return;
             }
-
-            $buffer = substr($buffer, strlen($position));
-
-            return;
         }
 
         throw LogicException::format('Should be unreachable code');
@@ -255,13 +245,13 @@ final class Program
                     ),
                     sprintf(
                         "STDOUT:\n%s\n\nSTDERR:\n%s",
-                        preg_replace('~^~', '  ', $this->bufferStdout),
-                        preg_replace('~^~', '  ', $this->bufferStderr)
+                        preg_replace('~^~', '  ', $this->stdout->getContents()),
+                        preg_replace('~^~', '  ', $this->stderr->getContents())
                     )
                 );
             }
 
-            $read     = [$this->stdout, $this->stderr];
+            $read     = [$this->stdout->getStream(), $this->stderr->getStream()];
             $write    = [];
             $except   = [];
             $readable = stream_select($read, $write, $except, 0, min($timeLeft * 1000 * 1000, 0.100 * 1000 * 1000));
@@ -285,8 +275,8 @@ final class Program
     private function terminate()
     {
         @fclose($this->stdin);
-        @fclose($this->stdout);
-        @fclose($this->stderr);
+        @$this->stdout->close();
+        @$this->stderr->close();
         @proc_terminate($this->handle);
     }
 
