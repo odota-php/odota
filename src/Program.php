@@ -19,7 +19,9 @@ final class Program
     /** @var resource */
     private $stdin;
     /** @var string */
-    private $buffer;
+    private $bufferStdout;
+    /** @var string */
+    private $bufferStderr;
     /** @var float */
     private $timeout;
 
@@ -69,7 +71,8 @@ final class Program
         $this->stdout  = $stdout;
         $this->stderr  = $stderr;
         $this->stdin   = $stdin;
-        $this->buffer  = '';
+        $this->bufferStdout = '';
+        $this->bufferStderr = '';
         $this->timeout = self::DEFAULT_TIMEOUT;
     }
 
@@ -118,6 +121,12 @@ final class Program
 
         $start = microtime(true);
 
+        if ($stream === 'stdout') {
+            $buffer = &$this->bufferStdout;
+        } else {
+            $buffer = &$this->bufferStderr;
+        }
+
         while (true) {
             $timeLeft = $this->timeout - (microtime(true) - $start);
 
@@ -129,7 +138,7 @@ final class Program
                         $expected,
                         $this->timeout
                     ),
-                    $this->buffer
+                    $buffer
                 );
             }
 
@@ -146,15 +155,15 @@ final class Program
 
             do {
                 $bytes = fread($this->$stream, 4096);
-                $this->buffer .= $bytes;
+                $buffer .= $bytes;
             } while ($bytes !== '');
 
-            $position = strpos($this->buffer, $expected);
+            $position = strpos($buffer, $expected);
             if ($position === false) {
                 continue;
             }
 
-            $this->buffer = substr($this->buffer, strlen($position));
+            $buffer = substr($buffer, strlen($position));
 
             return;
         }
@@ -241,7 +250,11 @@ final class Program
                         'Program did not terminate within %.3f seconds',
                         $this->timeout
                     ),
-                    $this->buffer
+                    sprintf(
+                        "STDOUT:\n%s\n\nSTDERR:\n%s",
+                        preg_replace('~^~', '  ', $this->bufferStdout),
+                        preg_replace('~^~', '  ', $this->bufferStderr)
+                    )
                 );
             }
 

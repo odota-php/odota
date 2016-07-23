@@ -153,14 +153,11 @@ class ProgramTest extends TestCase
     }
 
     /** @test */
-    public function stdout_stderr_mix()
+    public function handles_expectations_on_different_streams_after_each_other()
     {
-        $this->markTestIncomplete();
-    }
-
-    /** @test */
-    public function negative_timeout_after()
-    {
-        $this->markTestIncomplete();
+        program('echo A; echo B >&2; echo C')
+            ->expect('A')
+            ->expectError('B')
+            ->expect('C');
     }
 }
