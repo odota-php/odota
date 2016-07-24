@@ -41,6 +41,6 @@ final class ExactMatcher implements Matcher
      */
     public function __toString()
     {
-        return sprintf('ExactMatcher<%s>', $this->toMatch);
+        return sprintf('ExactMatcher("%s")', $this->toMatch);
     }
 }
