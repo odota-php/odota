@@ -96,26 +96,14 @@ final class Program
     {
         assertString($expected, 'Expected expected string to be a string, got "%s" of type "%s"');
 
-        $this->expectFromStream('output', new ExactMatcher($expected));
-
-        return $this;
-    }
-
-    /**
-     * @param string  $stream
-     * @param Matcher $matcher
-     */
-    private function expectFromStream($stream, Matcher $matcher)
-    {
-        /** @var Buffer $buffer */
-        $buffer = &$this->$stream;
+        $matcher = new ExactMatcher($expected);
 
         $start = microtime(true);
 
         while (true) {
-            $bytesMatched = $buffer->matchAndDrop($matcher);
+            $bytesMatched = $this->output->matchAndDrop($matcher);
             if ($bytesMatched > 0) {
-                return;
+                return $this;
             }
 
             $timeLeft = $this->timeout - (microtime(true) - $start);
@@ -125,9 +113,8 @@ final class Program
                 if ($status['exitcode'] !== -self::DESCRIPTOR_STDOUT) {
                     throw new ExpectationTimedOutException(
                         sprintf(
-                            'Stream "%s" did not output expected "%s" within %.3f seconds; ' .
+                            'Program did not output expected "%s" within %.3f seconds; ' .
                             'the program exited early with exit code %d',
-                            $stream,
                             $matcher,
                             $this->timeout,
                             $status['exitcode']
@@ -138,8 +125,7 @@ final class Program
 
                 throw new ExpectationTimedOutException(
                     sprintf(
-                        'Stream "%s" did not output expected "%s" within %.3f seconds',
-                        $stream,
+                        'Program did not output expected "%s" within %.3f seconds',
                         $matcher,
                         $this->timeout
                     ),
