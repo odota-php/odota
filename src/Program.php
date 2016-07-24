@@ -7,6 +7,10 @@ use Expect\Expect\Matcher\ExactMatcher;
 
 final class Program
 {
+    const DESCRIPTOR_STDIN = 0;
+    const DESCRIPTOR_STDOUT = 1;
+    const DESCRIPTOR_STDERR = 2;
+
     /**
      * The default timeout (100ms) after which expectations time out. You can adjust
      * this per program using {timeoutAfter()}.
@@ -16,9 +20,7 @@ final class Program
     /** @var resource */
     private $handle;
     /** @var Buffer */
-    private $stdout;
-    /** @var Buffer */
-    private $stderr;
+    private $output;
     /** @var resource */
     private $stdin;
     /** @var float */
@@ -44,34 +46,29 @@ final class Program
         $process = proc_open(
             $command,
             [
-                0 => ["pipe", "r"],
-                1 => ["pipe", "w"],
-                2 => ["pipe", "w"],
+                self::DESCRIPTOR_STDIN  => ['pipe', 'r'],
+                self::DESCRIPTOR_STDOUT => ['pty'],
+                self::DESCRIPTOR_STDERR => ['pty'],
             ],
             $pipes,
             $workingDirectory,
             $environmentVariables
         );
-        stream_set_blocking($pipes[1], 0);
-        stream_set_blocking($pipes[2], 0);
+        stream_set_blocking($pipes[self::DESCRIPTOR_STDOUT], 0);
 
-        return new Program($process, new StreamBuffer($pipes[1]), new StreamBuffer($pipes[2]), $pipes[0]);
+        return new Program($process, new StreamBuffer($pipes[self::DESCRIPTOR_STDOUT]), $pipes[self::DESCRIPTOR_STDIN]);
     }
 
     /**
      * @param resource $handle
-     * @param Buffer   $stdout
-     * @param Buffer   $stderr
+     * @param Buffer   $output
      * @param resource $stdin
      */
-    private function __construct($handle, Buffer $stdout, Buffer $stderr, $stdin)
+    private function __construct($handle, Buffer $output, $stdin)
     {
         $this->handle = $handle;
-        $this->stdout = $stdout;
-        $this->stderr = $stderr;
+        $this->output = $output;
         $this->stdin = $stdin;
-        $this->bufferStdout = '';
-        $this->bufferStderr = '';
         $this->timeout = self::DEFAULT_TIMEOUT;
     }
 
@@ -99,20 +96,7 @@ final class Program
     {
         assertString($expected, 'Expected expected string to be a string, got "%s" of type "%s"');
 
-        $this->expectFromStream('stdout', new ExactMatcher($expected));
-
-        return $this;
-    }
-
-    /**
-     * @param string $expected
-     * @return static
-     */
-    public function expectError($expected)
-    {
-        assertString($expected, 'Expected expected string to be a string, got "%s" of type "%s"');
-
-        $this->expectFromStream('stderr', new ExactMatcher($expected));
+        $this->expectFromStream('output', new ExactMatcher($expected));
 
         return $this;
     }
@@ -129,6 +113,11 @@ final class Program
         $start = microtime(true);
 
         while (true) {
+            $bytesMatched = $buffer->matchAndDrop($matcher);
+            if ($bytesMatched > 0) {
+                return;
+            }
+
             $timeLeft = $this->timeout - (microtime(true) - $start);
 
             if ($timeLeft <= 0) {
@@ -139,11 +128,11 @@ final class Program
                         $matcher,
                         $this->timeout
                     ),
-                    $buffer->getContents()
+                    $this->output->getContents()
                 );
             }
 
-            $read = [$buffer->getStream()];
+            $read = [$this->output->getStream()];
             $write = [];
             $except = [];
             $readable = stream_select($read, $write, $except, 0, $timeLeft * 1000 * 1000);
@@ -154,12 +143,7 @@ final class Program
                 continue;
             }
 
-            $buffer->read();
-            $bytesMatched = $buffer->matchAndDrop($matcher);
-
-            if ($bytesMatched > 0) {
-                return;
-            }
+            $this->output->read();
         }
 
         throw LogicException::format('Should be unreachable code');
@@ -241,15 +225,11 @@ final class Program
                         'Program did not terminate within %.3f seconds',
                         $this->timeout
                     ),
-                    sprintf(
-                        "STDOUT:\n%s\n\nSTDERR:\n%s",
-                        preg_replace('~^~', '  ', $this->stdout->getContents()),
-                        preg_replace('~^~', '  ', $this->stderr->getContents())
-                    )
+                    $this->output->getContents()
                 );
             }
 
-            $read = [$this->stdout->getStream(), $this->stderr->getStream()];
+            $read = [$this->output->getStream()];
             $write = [];
             $except = [];
             $readable = stream_select($read, $write, $except, 0, min($timeLeft * 1000 * 1000, 0.100 * 1000 * 1000));
@@ -273,8 +253,7 @@ final class Program
     private function terminate()
     {
         fclose($this->stdin);
-        $this->stdout->close();
-        $this->stderr->close();
+        $this->output->close();
         proc_terminate($this->handle);
     }
 

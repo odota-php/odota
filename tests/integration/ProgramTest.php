@@ -28,13 +28,6 @@ class ProgramTest extends TestCase
     }
 
     /** @test */
-    public function can_expect_a_string_in_stderr()
-    {
-        program('echo YAY >&2')
-            ->expectError('YAY');
-    }
-
-    /** @test */
     public function can_respond_to_questions()
     {
         program('echo -n " > "; read name; echo "Hello, $name!"')
@@ -55,10 +48,10 @@ class ProgramTest extends TestCase
         } catch (ExpectationTimedOutException $e) {
             assertContains(
                 'Hello, Bob!',
-                $e->getRemainingInBuffer(),
+                $e->getRemainingInOutputBuffer(),
                 sprintf(
                     'Expected "Hello, Bob!" to be present in remaining buffer, got "%s"',
-                    $e->getRemainingInBuffer()
+                    $e->getRemainingInOutputBuffer()
                 )
             );
         }
@@ -154,20 +147,11 @@ class ProgramTest extends TestCase
     }
 
     /** @test */
-    public function handles_expectations_on_different_streams_after_each_other()
+    public function stderr_is_mixed_with_stdout()
     {
         program('echo A; echo B >&2; echo C')
             ->expect('A')
-            ->expectError('B')
-            ->expect('C');
-    }
-
-    /** @test */
-    public function allows_expecting_from_stdout_and_stderr_out_of_order()
-    {
-        program('echo AC; echo B >&2')
-            ->expect('A')
-            ->expectError('B')
+            ->expect('B')
             ->expect('C');
     }
 
@@ -197,7 +181,19 @@ class ProgramTest extends TestCase
                 ->timeoutAfter(0.050)
                 ->expect('YAY');
         } catch (ExpectationTimedOutException $e) {
-            assertSame('NAY', $e->getRemainingInBuffer());
+            assertSame('NAY', $e->getRemainingInOutputBuffer());
         }
+    }
+
+    protected function onNotSuccessfulTest($e)
+    {
+        if ($e instanceof ExpectationTimedOutException) {
+            printf(
+                "\n\nRemaining in Expect buffer:\n---\n%s\n---\n\n",
+                $e->getRemainingInOutputBuffer()
+            );
+        }
+
+        parent::onNotSuccessfulTest($e);
     }
 }
