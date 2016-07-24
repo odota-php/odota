@@ -121,6 +121,21 @@ final class Program
             $timeLeft = $this->timeout - (microtime(true) - $start);
 
             if ($timeLeft <= 0) {
+                $status = proc_get_status($this->handle);
+                if ($status['exitcode'] !== -self::DESCRIPTOR_STDOUT) {
+                    throw new ExpectationTimedOutException(
+                        sprintf(
+                            'Stream "%s" did not output expected "%s" within %.3f seconds; ' .
+                            'the program exited early with exit code %d',
+                            $stream,
+                            $matcher,
+                            $this->timeout,
+                            $status['exitcode']
+                        ),
+                        $this->output->getContents()
+                    );
+                }
+
                 throw new ExpectationTimedOutException(
                     sprintf(
                         'Stream "%s" did not output expected "%s" within %.3f seconds',
