@@ -2,7 +2,7 @@
 
 namespace Expect\Expect;
 
-final class ExpectationTimedOutException extends RuntimeException
+final class UnexpectedExitCodeException extends RuntimeException
 {
     /** @var string */
     private $remainingInStdout;

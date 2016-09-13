@@ -4,12 +4,25 @@ namespace Expect\Expect\IntegrationTest;
 
 use Expect\Expect\ExpectationTimedOutException;
 use Expect\Expect\InvalidArgumentException;
-use Expect\Expect\RuntimeException;
+use Expect\Expect\UnexpectedExitCodeException;
 use PHPUnit\Framework\TestCase as TestCase;
 use function Expect\Expect\program;
 
 class ProgramTest extends TestCase
 {
+    protected function onNotSuccessfulTest($e)
+    {
+        if ($e instanceof ExpectationTimedOutException) {
+            printf(
+                "\n\nRemaining in Expect buffer:\n--- STDOUT ---\n%s\n--- STDERR ---\n%s\n\n",
+                $e->getRemainingInStdout(),
+                $e->getRemainingInStderr()
+            );
+        }
+
+        parent::onNotSuccessfulTest($e);
+    }
+
     /** @test */
     public function can_expect_a_string_after_some_sleep()
     {
@@ -25,6 +38,13 @@ class ProgramTest extends TestCase
         program('sleep 0.100 && echo YAY')
             ->timeoutAfter(0.050)
             ->expect('YAY');
+    }
+
+    /** @test */
+    public function can_expect_a_string_in_stderr()
+    {
+        program('echo YAY >&2')
+            ->expectError('YAY');
     }
 
     /** @test */
@@ -48,10 +68,10 @@ class ProgramTest extends TestCase
         } catch (ExpectationTimedOutException $e) {
             assertContains(
                 'Hello, Bob!',
-                $e->getRemainingInOutputBuffer(),
+                $e->getRemainingInStdout(),
                 sprintf(
                     'Expected "Hello, Bob!" to be present in remaining buffer, got "%s"',
-                    $e->getRemainingInOutputBuffer()
+                    $e->getRemainingInStdout()
                 )
             );
         }
@@ -70,17 +90,17 @@ class ProgramTest extends TestCase
     {
         program('echo AZ')
             ->expect('A')
-            ->success();
+            ->exitsWith(0);
     }
 
     /** @test */
     public function throws_an_exception_when_program_doesnt_exit_successfully()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Expected program to exit successfully, got exit code 1');
+        $this->expectException(UnexpectedExitCodeException::class);
+        $this->expectExceptionMessage('Expected program to exit with exit code 0, got exit code 1');
 
         program('exit 1')
-            ->success();
+            ->exitsWith(0);
     }
 
     /** @test */
@@ -91,7 +111,7 @@ class ProgramTest extends TestCase
         try {
             program('sleep 1')
                 ->timeoutAfter(0.100)
-                ->success();
+                ->exitsWith(0);
             $this->fail('Program shouldn\'t have exited within 100 milliseconds');
         } catch (ExpectationTimedOutException $e) {
             // Great! Now we still have to check whether this didn't occur after 1 second,
@@ -116,42 +136,51 @@ class ProgramTest extends TestCase
     public function assert_program_exits_with_an_nonzero_exit_code()
     {
         program('exit 1')
-            ->failure();
+            ->exitsWith(1);
     }
 
     /** @test */
     public function throws_an_exception_when_program_unexpectedly_succeeds()
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Expected program to exit with a non-zero exit code, got exit code 0');
+        $this->expectException(UnexpectedExitCodeException::class);
+        $this->expectExceptionMessage('Expected program to exit with exit code 2, got exit code 0');
 
         program('echo OK')
-            ->failure();
+            ->exitsWith(2);
     }
 
     /** @test */
     public function assert_program_exits_with_a_certain_exit_code()
     {
         program('exit 2')
-            ->failure(2);
+            ->exitsWith(2);
     }
 
     /** @test */
     public function throws_an_exception_when_program_exits_with_other_exit_code()
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(UnexpectedExitCodeException::class);
         $this->expectExceptionMessage('Expected program to exit with exit code 2, got exit code 1');
 
         program('exit 1')
-            ->failure(2);
+            ->exitsWith(2);
     }
 
     /** @test */
-    public function stderr_is_mixed_with_stdout()
+    public function handles_expectations_on_different_streams_after_each_other()
     {
         program('echo A; echo B >&2; echo C')
             ->expect('A')
-            ->expect('B')
+            ->expectError('B')
+            ->expect('C');
+    }
+
+    /** @test */
+    public function allows_expecting_from_stdout_and_stderr_out_of_order()
+    {
+        program('echo AC; echo B >&2')
+            ->expect('A')
+            ->expectError('B')
             ->expect('C');
     }
 
@@ -181,19 +210,18 @@ class ProgramTest extends TestCase
                 ->timeoutAfter(0.050)
                 ->expect('YAY');
         } catch (ExpectationTimedOutException $e) {
-            assertSame('NAY', $e->getRemainingInOutputBuffer());
+            assertSame('NAY', $e->getRemainingInStdout());
         }
     }
 
-    protected function onNotSuccessfulTest($e)
+    /** @test */
+    public function can_work_with_symfony_console_applications()
     {
-        if ($e instanceof ExpectationTimedOutException) {
-            printf(
-                "\n\nRemaining in Expect buffer:\n---\n%s\n---\n\n",
-                $e->getRemainingInOutputBuffer()
-            );
-        }
-
-        parent::onNotSuccessfulTest($e);
+        program(PHP_BINARY . ' ./tests/bin/symfony-prompt.php -v')
+            ->timeoutAfter(1)
+            ->expectError('Say yes')
+            ->expectError(' > ')
+            ->sendln('yes')
+            ->exitsWith(0);
     }
 }

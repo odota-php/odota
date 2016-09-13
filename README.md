@@ -32,7 +32,7 @@ program('echo -n " > "; read name; sleep 2; echo "Hello, $name!"')
     ->sendln('Bob')
     ->timeoutAfter(3)
     ->expect('Hello, Bob!')
-    ->success();
+    ->exitsWith(0);
 
 // Expectation time-outs default to 100ms, but can be adjusted.
 program('sleep 2; echo OK')
@@ -42,7 +42,7 @@ program('sleep 2; echo OK')
 
 // Expect programs to fail.
 program('test -e non-existent-file')
-    ->failure();
+    ->exitsWith(1);
 ```
 
 ## Platform support

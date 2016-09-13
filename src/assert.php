@@ -55,9 +55,9 @@ function assertFloaty($value, $message)
  * @param string $message
  * @throws InvalidArgumentException
  */
-function assertIntegerOrNull($value, $message)
+function assertInteger($value, $message)
 {
-    if (!is_int($value) && !is_null($value)) {
+    if (!is_int($value)) {
         throw InvalidArgumentException::format($message, stringify($value), gettype($value));
     }
 }

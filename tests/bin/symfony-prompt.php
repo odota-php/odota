@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -9,6 +8,7 @@ use Symfony\Component\Console\Question\Question;
 require __DIR__ . '/../../vendor/autoload.php';
 
 $input = new StringInput('');
+$input->setInteractive(true);
 $output = new ConsoleOutput(ConsoleOutput::VERBOSITY_DEBUG);
 
 $questionHelper = new QuestionHelper();

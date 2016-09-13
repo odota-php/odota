@@ -7,10 +7,6 @@ use Expect\Expect\Matcher\ExactMatcher;
 
 final class Program
 {
-    const DESCRIPTOR_STDIN = 0;
-    const DESCRIPTOR_STDOUT = 1;
-    const DESCRIPTOR_STDERR = 2;
-
     /**
      * The default timeout (100ms) after which expectations time out. You can adjust
      * this per program using {timeoutAfter()}.
@@ -20,7 +16,9 @@ final class Program
     /** @var resource */
     private $handle;
     /** @var Buffer */
-    private $output;
+    private $stdout;
+    /** @var Buffer */
+    private $stderr;
     /** @var resource */
     private $stdin;
     /** @var float */
@@ -46,29 +44,34 @@ final class Program
         $process = proc_open(
             $command,
             [
-                self::DESCRIPTOR_STDIN  => ['pipe', 'r'],
-                self::DESCRIPTOR_STDOUT => ['pty'],
-                self::DESCRIPTOR_STDERR => ['pty'],
+                0 => ["pipe", "r"],
+                1 => ["pipe", "w"],
+                2 => ["pipe", "w"],
             ],
             $pipes,
             $workingDirectory,
             $environmentVariables
         );
-        stream_set_blocking($pipes[self::DESCRIPTOR_STDOUT], 0);
+        stream_set_blocking($pipes[1], 0);
+        stream_set_blocking($pipes[2], 0);
 
-        return new Program($process, new StreamBuffer($pipes[self::DESCRIPTOR_STDOUT]), $pipes[self::DESCRIPTOR_STDIN]);
+        return new Program($process, new StreamBuffer($pipes[1]), new StreamBuffer($pipes[2]), $pipes[0]);
     }
 
     /**
      * @param resource $handle
-     * @param Buffer   $output
+     * @param Buffer   $stdout
+     * @param Buffer   $stderr
      * @param resource $stdin
      */
-    private function __construct($handle, Buffer $output, $stdin)
+    private function __construct($handle, Buffer $stdout, Buffer $stderr, $stdin)
     {
         $this->handle = $handle;
-        $this->output = $output;
+        $this->stdout = $stdout;
+        $this->stderr = $stderr;
         $this->stdin = $stdin;
+        $this->bufferStdout = '';
+        $this->bufferStderr = '';
         $this->timeout = self::DEFAULT_TIMEOUT;
     }
 
@@ -96,21 +99,40 @@ final class Program
     {
         assertString($expected, 'Expected expected string to be a string, got "%s" of type "%s"');
 
-        $matcher = new ExactMatcher($expected);
+        $this->expectFromStream('stdout', new ExactMatcher($expected));
 
+        return $this;
+    }
+
+    /**
+     * @param string $expected
+     * @return static
+     */
+    public function expectError($expected)
+    {
+        assertString($expected, 'Expected expected string to be a string, got "%s" of type "%s"');
+
+        $this->expectFromStream('stderr', new ExactMatcher($expected));
+
+        return $this;
+    }
+
+    /**
+     * @param string  $stream
+     * @param Matcher $matcher
+     */
+    private function expectFromStream($stream, Matcher $matcher)
+    {
+        /** @var Buffer $buffer */
+        $buffer = &$this->$stream;
         $start = microtime(true);
 
         while (true) {
-            $bytesMatched = $this->output->matchAndDrop($matcher);
-            if ($bytesMatched > 0) {
-                return $this;
-            }
-
             $timeLeft = $this->timeout - (microtime(true) - $start);
 
             if ($timeLeft <= 0) {
                 $status = proc_get_status($this->handle);
-                if ($status['exitcode'] !== -self::DESCRIPTOR_STDOUT) {
+                if ($status['exitcode'] !== -1) {
                     throw new ExpectationTimedOutException(
                         sprintf(
                             'Program did not output expected "%s" within %.3f seconds; ' .
@@ -119,7 +141,8 @@ final class Program
                             $this->timeout,
                             $status['exitcode']
                         ),
-                        $this->output->getContents()
+                        $this->stdout->getContents(),
+                        $this->stderr->getContents()
                     );
                 }
 
@@ -129,22 +152,26 @@ final class Program
                         $matcher,
                         $this->timeout
                     ),
-                    $this->output->getContents()
+                    $this->stdout->getContents(),
+                    $this->stderr->getContents()
                 );
             }
 
-            $read = [$this->output->getStream()];
+            $buffer->read();
+            $bytesMatched = $buffer->matchAndDrop($matcher);
+
+            if ($bytesMatched > 0) {
+                return;
+            }
+
+            $read = [$buffer->getStream()];
             $write = [];
             $except = [];
             $readable = stream_select($read, $write, $except, 0, $timeLeft * 1000 * 1000);
 
             if ($readable === false) {
                 throw RuntimeException::format('Stream select error: "%s"', error_get_last()['message']);
-            } elseif ($readable === 0) {
-                continue;
             }
-
-            $this->output->read();
         }
 
         throw LogicException::format('Should be unreachable code');
@@ -175,42 +202,31 @@ final class Program
     }
 
     /**
-     * @throws RuntimeException When the program's exit code is not 0
+     * @param int $expectedExitCode
+     * @throws UnexpectedExitCodeException
      * @throws ExpectationTimedOutException
      */
-    public function success()
+    public function exitsWith($expectedExitCode = 0)
     {
-        $exitCode = $this->wait();
-
-        if ($exitCode !== 0) {
-            throw RuntimeException::format('Expected program to exit successfully, got exit code %d', $exitCode);
-        }
-    }
-
-    /**
-     * @param int|null $expectedExitCode
-     * @throws RuntimeException When the program's exit code is not 0
-     * @throws ExpectationTimedOutException
-     */
-    public function failure($expectedExitCode = null)
-    {
-        assertIntegerOrNull($expectedExitCode, 'Expected expected exit code to be an integer or null');
+        assertInteger($expectedExitCode, 'Expected expected exit code to be an integer');
 
         $actualExitCode = $this->wait();
 
-        if ($expectedExitCode === null && $actualExitCode === 0) {
-            throw RuntimeException::format('Expected program to exit with a non-zero exit code, got exit code 0');
-        }
-        if ($expectedExitCode !== null && $expectedExitCode !== $actualExitCode) {
-            throw RuntimeException::format(
-                'Expected program to exit with exit code %d, got exit code %d',
-                $expectedExitCode,
-                $actualExitCode
+        if ($expectedExitCode !== $actualExitCode) {
+            throw new UnexpectedExitCodeException(
+                sprintf(
+                    'Expected program to exit with exit code %d, got exit code %d',
+                    $expectedExitCode,
+                    $actualExitCode
+                ),
+                $this->stdout->getContents(),
+                $this->stderr->getContents()
             );
         }
     }
 
     /**
+     * @return int
      * @throws ExpectationTimedOutException
      */
     private function wait()
@@ -226,11 +242,17 @@ final class Program
                         'Program did not terminate within %.3f seconds',
                         $this->timeout
                     ),
-                    $this->output->getContents()
+                    $this->stdout->getContents(),
+                    $this->stderr->getContents()
                 );
             }
 
-            $read = [$this->output->getStream()];
+            $status = proc_get_status($this->handle);
+            if ($status['exitcode'] !== -1) {
+                return $status['exitcode'];
+            }
+
+            $read = [$this->stdout->getStream(), $this->stderr->getStream()];
             $write = [];
             $except = [];
             $readable = stream_select($read, $write, $except, 0, min($timeLeft * 1000 * 1000, 0.100 * 1000 * 1000));
@@ -239,13 +261,8 @@ final class Program
                 throw RuntimeException::format('Stream select error: "%s"', error_get_last()['message']);
             }
 
-            $status = proc_get_status($this->handle);
-
-            if ($status['exitcode'] === -1) {
-                continue;
-            }
-
-            return $status['exitcode'];
+            $this->stdout->read();
+            $this->stderr->read();
         }
 
         throw LogicException::format('Should be unreachable code');
@@ -254,7 +271,8 @@ final class Program
     private function terminate()
     {
         fclose($this->stdin);
-        $this->output->close();
+        $this->stdout->close();
+        $this->stderr->close();
         proc_terminate($this->handle);
     }
 
