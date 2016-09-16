@@ -4,6 +4,7 @@ namespace Expect\Expect\Buffer;
 
 use function Expect\Expect\assertIsResource;
 use Expect\Expect\Buffer;
+use Expect\Expect\LogicException;
 use Expect\Expect\Matcher;
 
 final class StreamBuffer implements Buffer
@@ -41,7 +42,14 @@ final class StreamBuffer implements Buffer
     {
         $bytesMatched = $matcher->match($this->contents);
 
-        $this->contents = substr($this->contents, $bytesMatched);
+        $contentsLength = strlen($this->contents);
+        if ($bytesMatched > $contentsLength) {
+            throw new LogicException(sprintf('Matcher could not have matched a string longer (%d) than the length of the buffer\'s contents (%d)', $bytesMatched, $contentsLength));
+        } elseif ($bytesMatched === $contentsLength) {
+            $this->contents = '';
+        } else {
+            $this->contents = $bytesMatched >= $contentsLength ? '' : substr($this->contents, $bytesMatched);
+        }
 
         return $bytesMatched > 0;
     }
