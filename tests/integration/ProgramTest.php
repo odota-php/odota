@@ -227,6 +227,32 @@ class ProgramTest extends TestCase
     }
 
     /** @test */
+    public function when_program_exits_after_having_output_an_expected_string_on_stdout_stderr_is_also_read_and_available_in_the_exceptions_stderr_buffer()
+    {
+        try {
+            program('echo -n A; echo -n B >&2')
+                ->expect('A')
+                ->exitsWith(0);
+        } catch (ExpectationTimedOutException $e) {
+            assertSame('', $e->getRemainingInStdout());
+            assertSame('B', $e->getRemainingInStderr());
+        }
+    }
+
+    /** @test */
+    public function when_a_program_exits_while_expecting_a_string_on_stdout_stderr_is_still_read_and_available_in_the_exceptions_stderr_buffer()
+    {
+        try {
+            program('echo -n A; echo -n Z >&2')
+                ->expect('A')
+                ->expect('B');
+        } catch (ExpectationTimedOutException $e) {
+            assertSame('', $e->getRemainingInStdout());
+            assertSame('Z', $e->getRemainingInStderr());
+        }
+    }
+
+    /** @test */
     public function can_work_with_symfony_console_applications()
     {
         program(PHP_BINARY . ' ./tests/bin/symfony-question-single.php -v')

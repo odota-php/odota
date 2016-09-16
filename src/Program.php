@@ -157,7 +157,8 @@ final class Program
                 );
             }
 
-            $buffer->read();
+            $this->stdout->read();
+            $this->stderr->read();
             $bytesMatched = $buffer->matchAndDrop($matcher);
 
             if ($bytesMatched > 0) {
@@ -247,6 +248,9 @@ final class Program
                 );
             }
 
+            $this->stdout->read();
+            $this->stderr->read();
+
             $status = proc_get_status($this->handle);
             if ($status['exitcode'] !== -1) {
                 return $status['exitcode'];
@@ -260,9 +264,6 @@ final class Program
             if ($readable === false) {
                 throw RuntimeException::format('Stream select error: "%s"', error_get_last()['message']);
             }
-
-            $this->stdout->read();
-            $this->stderr->read();
         }
 
         throw LogicException::format('Should be unreachable code');
