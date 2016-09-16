@@ -78,6 +78,18 @@ class ProgramTest extends TestCase
     }
 
     /** @test */
+    public function can_answer_multiple_questions()
+    {
+        program('echo -n "First name: "; read fname; echo -n " > Last name: "; read lname; echo "Hello, $fname $lname!"')
+            ->expect('First name:')
+            ->sendln('Bob')
+            ->expect('Last name:')
+            ->sendln('Saget')
+            ->expect('Hello, Bob Saget!')
+            ->exitsWith(0);
+    }
+
+    /** @test */
     public function can_expect_a_string_in_two_parts_even_though_its_all_in_the_buffer_already()
     {
         program('echo AZ')
@@ -217,11 +229,25 @@ class ProgramTest extends TestCase
     /** @test */
     public function can_work_with_symfony_console_applications()
     {
-        program(PHP_BINARY . ' ./tests/bin/symfony-prompt.php -v')
+        program(PHP_BINARY . ' ./tests/bin/symfony-question-single.php -v')
             ->timeoutAfter(1)
             ->expectError('Say yes')
             ->expectError(' > ')
             ->sendln('yes')
+            ->exitsWith(0);
+    }
+
+    /** @test */
+    public function can_answer_multiple_questions_of_a_symfony_console_application()
+    {
+        program(PHP_BINARY . ' ./tests/bin/symfony-question-multiple.php -v')
+            ->timeoutAfter(1)
+            ->expectError('Say yes')
+            ->expectError(' > ')
+            ->sendln('yes')
+            ->expectError('Say no')
+            ->expectError(' > ')
+            ->sendln('no')
             ->exitsWith(0);
     }
 }
