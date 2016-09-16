@@ -57,7 +57,7 @@ class ProgramTest extends TestCase
     }
 
     /** @test */
-    public function can_time_out_while_expecting_a_string_after_answer_a_question()
+    public function can_time_out_while_expecting_a_string_after_answering_a_question()
     {
         try {
             program('echo -n " > "; read name; echo "Hello, $name!"')
