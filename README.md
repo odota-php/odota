@@ -13,6 +13,14 @@ usage is controlling interactive programs in system tests.
 |---------|--------------|
 | develop | [![Travis](https://travis-ci.org/expectphp/expect.svg?branch=develop)](https://travis-ci.org/expectphp/expect) |
 
+ * [Installation](#installation)
+ * [API](#api)
+ * [Limitations](#limitations)
+ * [Platform support](#platform-support)
+ * [Why...](#why)
+    * [... not test against the PHP CLI application in user-land?](#-not-test-against-the-php-cli-application-in-user-land)
+    * [... create a PHP library when there are tools like `expect` and `empty`?](#-create-a-php-library-when-there-are-tools-like-expect-and-empty)
+
 ## Installation
 
 ```shell-session
