@@ -75,3 +75,33 @@ supported, because the use of `stream_select()` on file descriptors returned by
 `proc_open()` [will fail][php-stream-select] and return `false` under Windows.
 
 [php-stream-select]: http://php.net/manual/en/function.stream-select.php
+
+## Why...
+
+### ... not test against the PHP CLI application in user-land?
+
+A simpler way of testing PHP CLI applications would be to boot the application
+in the same execution context as the test, like Symfony
+[helps you do][sf-cli-testing]. There are a couple of reasons for testing
+against the final executable. Let's start with a remark by Nat Price:
+
+> System tests exercise the entire system end-to-end, driving the system through
+> its published remote interfaces and user interface. They also exercise the
+> packaging, deployment and startup of the system. ([source][nat-pryce-system],
+> as of September 17, 2016)
+
+So testing against the final executable (the “production” executable), you get
+closer to the “production” state of your application, namely as a PHP script
+called from the shell. The difference is even greater when you package your
+application as a [Phar][php-phar].
+
+[nat-pryce-system]: http://www.natpryce.com/articles/000772.html
+[php-phar]: http://php.net/manual/en/book.phar.php
+
+### ... create a PHP library when there are tools like `expect` and `empty`?
+
+ * To enable testing with a more familiar language, PHP. `expect` uses Tcl.
+ * To enable testing with your favourite PHP testing framework.
+ * To provide a testing API, rather than just interactive dialogue.
+ * To allow testing your system-under-test's side-effects, like file system
+   changes, in the same test context.
