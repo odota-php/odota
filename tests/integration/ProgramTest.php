@@ -253,7 +253,7 @@ class ProgramTest extends TestCase
     }
 
     /** @test */
-    public function can_work_with_symfony_console_applications()
+    public function can_answer_single_symfony_question()
     {
         program(PHP_BINARY . ' ./tests/bin/symfony-question-single.php -v')
             ->timeoutAfter(1)
@@ -264,7 +264,7 @@ class ProgramTest extends TestCase
     }
 
     /** @test */
-    public function can_answer_multiple_questions_of_a_symfony_console_application()
+    public function can_answer_multiple_symfony_question()
     {
         program(PHP_BINARY . ' ./tests/bin/symfony-question-multiple.php -v')
             ->timeoutAfter(1)
@@ -274,6 +274,17 @@ class ProgramTest extends TestCase
             ->expectError('Say no')
             ->expectError(' > ')
             ->sendln('no')
+            ->exitsWith(0);
+    }
+
+    /** @test */
+    public function can_answer_multiple_questions_of_a_symfony_console_application_with_shell_interactive_true()
+    {
+        program(PHP_BINARY . ' ./tests/bin/symfony-console-application.php interview -v', null, ['SHELL_INTERACTIVE' => 'true'])
+            ->timeoutAfter(1)
+            ->expectError('Say yes')
+            ->expectError(' > ')
+            ->sendln('yes')
             ->exitsWith(0);
     }
 }
