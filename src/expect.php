@@ -10,5 +10,5 @@ namespace Expect\Expect;
  */
 function program($command, $workingDirectory = null, array $environmentVariables = null)
 {
-    return Program::interactWith($command, $workingDirectory, $environmentVariables);
+    return Program::spawn($command, $workingDirectory, $environmentVariables);
 }

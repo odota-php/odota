@@ -30,7 +30,7 @@ final class Program
      * @param string[]|null $environmentVariables
      * @return Program
      */
-    public static function interactWith($command, $workingDirectory = null, array $environmentVariables = null)
+    public static function spawn($command, $workingDirectory = null, array $environmentVariables = null)
     {
         $workingDirectory = $workingDirectory ?: getcwd();
         $environmentVariables = $environmentVariables ?: [];
@@ -207,7 +207,7 @@ final class Program
      * @throws UnexpectedExitCodeException
      * @throws ExpectationTimedOutException
      */
-    public function exitsWith($expectedExitCode = 0)
+    public function expectExitCode($expectedExitCode = 0)
     {
         assertInteger($expectedExitCode, 'Expected expected exit code to be an integer');
 

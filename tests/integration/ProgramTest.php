@@ -86,7 +86,7 @@ class ProgramTest extends TestCase
             ->expect('Last name:')
             ->sendln('Saget')
             ->expect('Hello, Bob Saget!')
-            ->exitsWith(0);
+            ->expectExitCode(0);
     }
 
     /** @test */
@@ -102,7 +102,7 @@ class ProgramTest extends TestCase
     {
         program('echo AZ')
             ->expect('A')
-            ->exitsWith(0);
+            ->expectExitCode(0);
     }
 
     /** @test */
@@ -112,7 +112,7 @@ class ProgramTest extends TestCase
         $this->expectExceptionMessage('Expected program to exit with exit code 0, got exit code 1');
 
         program('exit 1')
-            ->exitsWith(0);
+            ->expectExitCode(0);
     }
 
     /** @test */
@@ -123,7 +123,7 @@ class ProgramTest extends TestCase
         try {
             program('sleep 1')
                 ->timeoutAfter(0.100)
-                ->exitsWith(0);
+                ->expectExitCode(0);
             $this->fail('Program shouldn\'t have exited within 100 milliseconds');
         } catch (ExpectationTimedOutException $e) {
             // Great! Now we still have to check whether this didn't occur after 1 second,
@@ -148,7 +148,7 @@ class ProgramTest extends TestCase
     public function assert_program_exits_with_an_nonzero_exit_code()
     {
         program('exit 1')
-            ->exitsWith(1);
+            ->expectExitCode(1);
     }
 
     /** @test */
@@ -158,14 +158,14 @@ class ProgramTest extends TestCase
         $this->expectExceptionMessage('Expected program to exit with exit code 2, got exit code 0');
 
         program('echo OK')
-            ->exitsWith(2);
+            ->expectExitCode(2);
     }
 
     /** @test */
     public function assert_program_exits_with_a_certain_exit_code()
     {
         program('exit 2')
-            ->exitsWith(2);
+            ->expectExitCode(2);
     }
 
     /** @test */
@@ -175,7 +175,7 @@ class ProgramTest extends TestCase
         $this->expectExceptionMessage('Expected program to exit with exit code 2, got exit code 1');
 
         program('exit 1')
-            ->exitsWith(2);
+            ->expectExitCode(2);
     }
 
     /** @test */
@@ -232,7 +232,7 @@ class ProgramTest extends TestCase
         try {
             program('echo -n A; echo -n B >&2')
                 ->expect('A')
-                ->exitsWith(0);
+                ->expectExitCode(0);
         } catch (ExpectationTimedOutException $e) {
             assertSame('', $e->getRemainingInStdout());
             assertSame('B', $e->getRemainingInStderr());
@@ -260,7 +260,7 @@ class ProgramTest extends TestCase
             ->expectError('Say yes')
             ->expectError(' > ')
             ->sendln('yes')
-            ->exitsWith(0);
+            ->expectExitCode(0);
     }
 
     /** @test */
@@ -274,7 +274,7 @@ class ProgramTest extends TestCase
             ->expectError('Say no')
             ->expectError(' > ')
             ->sendln('no')
-            ->exitsWith(0);
+            ->expectExitCode(0);
     }
 
     /** @test */
@@ -285,6 +285,6 @@ class ProgramTest extends TestCase
             ->expectError('Say yes')
             ->expectError(' > ')
             ->sendln('yes')
-            ->exitsWith(0);
+            ->expectExitCode(0);
     }
 }
