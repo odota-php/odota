@@ -32,6 +32,12 @@ final class Program
      */
     public static function spawn($command, $workingDirectory = null, array $environmentVariables = null)
     {
+        if (DIRECTORY_SEPARATOR === '\\') {
+            throw new RuntimeException(
+                'Expect is not supported on Windows; stream_select() on proc_open() pipes does not work'
+            );
+        }
+
         $workingDirectory = $workingDirectory ?: getcwd();
         $environmentVariables = $environmentVariables ?: [];
 
