@@ -43,6 +43,10 @@ program('sleep 2; echo OK')
 // Expect programs to fail.
 program('test -e non-existent-file')
     ->expectExitCode(1);
+
+// Expect output on standard error
+program('echo LOG >&2')
+    ->expectError('LOG');
 ```
 
 ## Limitations
