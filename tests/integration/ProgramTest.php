@@ -4,6 +4,7 @@ namespace Expect\Expect\IntegrationTest;
 
 use Expect\Expect\ExpectationTimedOutException;
 use Expect\Expect\InvalidArgumentException;
+use Expect\Expect\Program;
 use Expect\Expect\UnexpectedExitCodeException;
 use PHPUnit\Framework\TestCase as TestCase;
 use function Expect\Expect\spawn;
@@ -285,6 +286,34 @@ class ProgramTest extends TestCase
             ->expectError('Say yes')
             ->expectError(' > ')
             ->sendln('yes')
+            ->expectExitCode(0);
+    }
+
+    /** @test */
+    public function the_tests_environment_variables_are_passed_on_by_default()
+    {
+        $home = getenv('HOME');
+        if ($home === false) {
+            $this->markTestSkipped("The current environment doesn't have a HOME environment variable");
+        }
+
+        spawn(PHP_BINARY . ' ./tests/bin/print-env-home.php')
+            ->timeoutAfter(1)
+            ->expectError('"' . $home . '"')
+            ->expectExitCode(0);
+    }
+
+    /** @test */
+    public function the_tests_environment_variables_are_not_available_when_starting_with_an_empty_environment()
+    {
+        $home = getenv('HOME');
+        if ($home === false) {
+            $this->markTestSkipped("The current environment doesn't have a HOME environment variable");
+        }
+
+        spawn(PHP_BINARY . ' ./tests/bin/print-env-home.php', null, null, Program::START_WITH_EMPTY_ENV)
+            ->timeoutAfter(1)
+            ->expectError('""')
             ->expectExitCode(0);
     }
 }

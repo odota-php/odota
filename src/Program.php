@@ -13,6 +13,9 @@ final class Program
      */
     const DEFAULT_TIMEOUT = 0.100;
 
+    const START_WITH_EMPTY_ENV = true;
+    const COPY_ENV = false;
+
     /** @var resource */
     private $handle;
     /** @var Buffer */
@@ -28,18 +31,33 @@ final class Program
      * @param string        $command
      * @param string|null   $workingDirectory
      * @param string[]|null $environmentVariables
+     * @param bool          $startWithEmptyEnvironment
      * @return Program
      */
-    public static function spawn($command, $workingDirectory = null, array $environmentVariables = null)
-    {
+    public static function spawn(
+        $command,
+        $workingDirectory = null,
+        array $environmentVariables = null,
+        $startWithEmptyEnvironment = false
+    ) {
         if (DIRECTORY_SEPARATOR === '\\') {
             throw new RuntimeException(
                 'Expect is not supported on Windows; stream_select() on proc_open() pipes does not work'
             );
         }
+        if (!$startWithEmptyEnvironment && strpos(ini_get('variables_order'), 'E') === false) {
+            throw new RuntimeException(
+                'Your current PHP configuration prevents the filling of the $_ENV superglobal. ' .
+                'Include "E" in the PHP ini setting "variables_order".'
+            );
+        }
 
         $workingDirectory = $workingDirectory ?: getcwd();
         $environmentVariables = $environmentVariables ?: [];
+
+        if (!$startWithEmptyEnvironment) {
+            $environmentVariables = $environmentVariables + $_ENV;
+        }
 
         assertNonBlankString(
             $workingDirectory,

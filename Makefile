@@ -13,4 +13,4 @@ test-integration: phpunit-integration
 
 
 phpunit-integration:
-    vendor/bin/phpunit -c . --testsuite integration
+    php -d variables_order=EGPCS vendor/bin/phpunit -c . --testsuite integration

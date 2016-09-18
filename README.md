@@ -12,6 +12,7 @@ PHP, it is easily integrated in your testing framework of choice.
  * [Installation](#installation)
  * [API](#api)
  * [Limitations](#limitations)
+ * [Caveats](#caveats)
  * [Platform support](#platform-support)
  * [Why...](#why)
     * [... not test against the PHP CLI application in user-land?](#-not-test-against-the-php-cli-application-in-user-land)
@@ -76,6 +77,17 @@ force interactivity.
 [man-expect]: http://linux.die.net/man/1/expect
 [man-empty]: http://manpages.ubuntu.com/manpages/trusty/man1/empty.1.html
 [pr-shell-interactive]: https://github.com/symfony/symfony/pull/14102
+
+## Caveats
+
+To pass the test caller's environment variables on to the system under test,
+the ini setting `variables_order` must include `E` to fill the `$_ENV`
+superglobal. Any easy fix is by including this ini setting on the command line
+when calling your test framework:
+
+```sh-session
+$ php -d variables_order=EGPCS vendor/bin/phpunit
+```
 
 ## Platform support
 
