@@ -1,10 +1,8 @@
 Expect ![stability-experimental](https://cloud.githubusercontent.com/assets/1734555/18616629/a740d892-7dbf-11e6-8718-64afa66fac0d.png)
 ======================================================================================================================================
 
-Programmed dialogue with interactive programs. A very basic alternative to the
-[`expect` command-line tool][man-expect] (Don Libes, NIST) and the
-[`expect` PHP extension][php-expect] written in user-land PHP. Its intended
-usage is controlling interactive programs in system tests.
+Programmed dialogue with interactive programs for system testing. Written in
+PHP, it is easily integrated in your testing framework of choice.
 
 [man-expect]: http://linux.die.net/man/1/expect
 [php-expect]: http://php.net/manual/en/book.expect.php

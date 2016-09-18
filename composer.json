@@ -1,6 +1,6 @@
 {
     "name": "expectphp/expect",
-    "description": "Programmed dialogue with interactive programs for PHP",
+    "description": "Programmed dialogue with interactive programs for system testing, written in PHP",
     "type": "library",
     "license": "MIT",
     "authors": [
