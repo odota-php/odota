@@ -4,10 +4,10 @@ namespace Expect\Expect\IntegrationTest;
 
 use Expect\Expect\ExpectationTimedOutException;
 use Expect\Expect\InvalidArgumentException;
-use Expect\Expect\Program;
 use Expect\Expect\UnexpectedExitCodeException;
 use PHPUnit\Framework\TestCase as TestCase;
 use function Expect\Expect\spawn;
+use function Expect\Expect\spawnWithEmptyEnv;
 
 class ProgramTest extends TestCase
 {
@@ -311,7 +311,7 @@ class ProgramTest extends TestCase
             $this->markTestSkipped("The current environment doesn't have a HOME environment variable");
         }
 
-        spawn(PHP_BINARY . ' ./tests/bin/print-env-home.php', null, null, Program::START_WITH_EMPTY_ENV)
+        spawnWithEmptyEnv(PHP_BINARY . ' ./tests/bin/print-env-home.php')
             ->timeoutAfter(1)
             ->expectError('""')
             ->expectExitCode(0);
