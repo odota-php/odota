@@ -1,5 +1,5 @@
-Expect
-======
+Expect ![stability-experimental](https://cloud.githubusercontent.com/assets/1734555/18616629/a740d892-7dbf-11e6-8718-64afa66fac0d.png)
+======================================================================================================================================
 
 Programmed dialogue with interactive programs. A very basic alternative to the
 [`expect` command-line tool][man-expect] (Don Libes, NIST) and the
