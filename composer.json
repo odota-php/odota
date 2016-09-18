@@ -13,7 +13,7 @@
         "psr-4": {
             "Expect\\Expect\\": "src"
         },
-        "files": ["src/assert.php", "src/expect.php"]
+        "files": ["src/assert.php", "src/program-fn.php"]
     },
     "autoload-dev": {
         "psr-4": {
