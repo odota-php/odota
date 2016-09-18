@@ -1,6 +1,16 @@
 {
     "name": "odota/odota",
     "description": "Programmed dialogue with interactive programs for system testing, written in PHP",
+    "keywords": [
+        "odota",
+        "odottaa",
+        "expect",
+        "system",
+        "cli",
+        "console",
+        "test",
+        "interactive"
+    ],
     "type": "library",
     "license": "MIT",
     "authors": [
