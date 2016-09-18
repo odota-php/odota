@@ -1,11 +1,11 @@
 <?php
 
-namespace Expect\Expect\Buffer;
+namespace Odota\Odota\Buffer;
 
-use function Expect\Expect\assertIsResource;
-use Expect\Expect\Buffer;
-use Expect\Expect\LogicException;
-use Expect\Expect\Matcher;
+use function Odota\Odota\assertIsResource;
+use Odota\Odota\Buffer;
+use Odota\Odota\LogicException;
+use Odota\Odota\Matcher;
 
 final class StreamBuffer implements Buffer
 {

@@ -1,5 +1,5 @@
-Expect ![stability-experimental](https://cloud.githubusercontent.com/assets/1734555/18616629/a740d892-7dbf-11e6-8718-64afa66fac0d.png) [![Travis build status](https://travis-ci.org/expectphp/expect.svg?branch=develop)](https://travis-ci.org/expectphp/expect)
-======
+Odota ![stability-experimental](https://cloud.githubusercontent.com/assets/1734555/18616629/a740d892-7dbf-11e6-8718-64afa66fac0d.png) [![Travis build status](https://travis-ci.org/odota-php/odota.svg?branch=develop)](https://travis-ci.org/odota-php/odota)
+===============================================================================================================================================================================================================================================================
 
 Programmed dialogue with interactive programs for system testing using PHP 5.6,
 PHP 7.x and HHVM. Written in PHP, it is easily integrated in your testing
@@ -21,7 +21,7 @@ framework of choice.
 ## Installation
 
 ```shell-session
-$ composer require --dev expectphp/expect
+$ composer require --dev odota/odota
 ```
 
 ## API
@@ -29,7 +29,7 @@ $ composer require --dev expectphp/expect
 Examples explain it all.
 
 ```php
-use function Expect\Expect\program;
+use function Odota\Odota\spawn;
 
 // Programmed dialogue with an interactive program.
 spawn('echo -n " > "; read name; sleep 2; echo "Hello, $name!"')
@@ -43,7 +43,7 @@ spawn('echo -n " > "; read name; sleep 2; echo "Hello, $name!"')
 spawn('sleep 2; echo OK')
     ->timeoutAfter(1)
     ->expect('OK');
-// Expect\Expect\ExpectationTimedOutException
+// Odota\Odota\ExpectationTimedOutException
 
 // Expect programs to fail.
 spawn('test -e non-existent-file')
@@ -62,8 +62,8 @@ pseudo-terminal for that matter—and disable interactivity. Other implementatio
 come to mind, and these may be implemented as different drivers in the future:
 
  * `proc_open()` with pty descriptors instead of pipes. Pseudo-terminal support
-   in PHP, however, is undocumented and [not supported by Travis][travis-pty]
-   at the time of writing (Sep 2016).
+   in PHP, however, is undocumented and not supported by Travis at the time of
+   writing (Sep 2016).
  * Writing a script to STDIN of the [`expect`][man-expect] binary.
  * Using the [`empty`][man-empty] command.
 
@@ -71,7 +71,6 @@ When testing Symfony CLI applications, set the
 [`SHELL_INTERACTIVE`][pr-shell-interactive] environment variable to true to
 force interactivity.
 
-[travis-pty]: https://travis-ci.org/expectphp/expect/jobs/147116695#L264
 [man-expect]: http://linux.die.net/man/1/expect
 [man-empty]: http://manpages.ubuntu.com/manpages/trusty/man1/empty.1.html
 [pr-shell-interactive]: https://github.com/symfony/symfony/pull/14102
@@ -89,7 +88,7 @@ $ php -d variables_order=EGPCS vendor/bin/phpunit
 
 ## Platform support
 
-Expect is tested against PHP 5.6, 7.x and HHVM 3.6 on Ubuntu-like systems. It
+Odota is tested against PHP 5.6, 7.x and HHVM 3.6 on Ubuntu-like systems. It
 should work on common Unixy systems, including Mac OS. Windows is not supported,
 because `stream_select()` on file descriptors returned by `proc_open()`
 [will fail][php-stream-select] under Windows.

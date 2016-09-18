@@ -1,13 +1,13 @@
 <?php
 
-namespace Expect\Expect\IntegrationTest;
+namespace Odota\Odota\IntegrationTest;
 
-use Expect\Expect\ExpectationTimedOutException;
-use Expect\Expect\InvalidArgumentException;
-use Expect\Expect\UnexpectedExitCodeException;
+use Odota\Odota\ExpectationTimedOutException;
+use Odota\Odota\InvalidArgumentException;
+use Odota\Odota\UnexpectedExitCodeException;
 use PHPUnit\Framework\TestCase as TestCase;
-use function Expect\Expect\spawn;
-use function Expect\Expect\spawnWithEmptyEnv;
+use function Odota\Odota\spawn;
+use function Odota\Odota\spawnWithEmptyEnv;
 
 class ProgramTest extends TestCase
 {

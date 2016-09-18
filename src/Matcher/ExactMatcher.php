@@ -1,10 +1,10 @@
 <?php
 
-namespace Expect\Expect\Matcher;
+namespace Odota\Odota\Matcher;
 
-use Expect\Expect\Matcher;
-use function Expect\Expect\assertNonBlankString;
-use function Expect\Expect\assertString;
+use Odota\Odota\Matcher;
+use function Odota\Odota\assertNonBlankString;
+use function Odota\Odota\assertString;
 
 final class ExactMatcher implements Matcher
 {

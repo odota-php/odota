@@ -1,6 +1,6 @@
 <?php
 
-namespace Expect\Expect;
+namespace Odota\Odota;
 
 final class UnexpectedExitCodeException extends ExpectationException
 {

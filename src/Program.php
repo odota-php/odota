@@ -1,9 +1,9 @@
 <?php
 
-namespace Expect\Expect;
+namespace Odota\Odota;
 
-use Expect\Expect\Buffer\StreamBuffer;
-use Expect\Expect\Matcher\ExactMatcher;
+use Odota\Odota\Buffer\StreamBuffer;
+use Odota\Odota\Matcher\ExactMatcher;
 
 final class Program
 {
@@ -42,7 +42,7 @@ final class Program
     ) {
         if (DIRECTORY_SEPARATOR === '\\') {
             throw new RuntimeException(
-                'Expect is not supported on Windows; stream_select() on proc_open() pipes does not work'
+                'Odota is not supported on Windows; stream_select() on proc_open() pipes does not work'
             );
         }
         if (!$startWithEmptyEnvironment && strpos(ini_get('variables_order'), 'E') === false) {

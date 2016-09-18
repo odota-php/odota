@@ -1,6 +1,6 @@
 <?php
 
-namespace Expect\Expect;
+namespace Odota\Odota;
 
 class InvalidArgumentException extends \InvalidArgumentException
 {
