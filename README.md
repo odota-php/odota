@@ -1,8 +1,9 @@
 Expect ![stability-experimental](https://cloud.githubusercontent.com/assets/1734555/18616629/a740d892-7dbf-11e6-8718-64afa66fac0d.png) [![Travis build status](https://travis-ci.org/expectphp/expect.svg?branch=develop)](https://travis-ci.org/expectphp/expect)
 ======
 
-Programmed dialogue with interactive programs for system testing. Written in
-PHP, it is easily integrated in your testing framework of choice.
+Programmed dialogue with interactive programs for system testing using PHP 5.6,
+PHP 7.x and HHVM. Written in PHP, it is easily integrated in your testing
+framework of choice.
 
 [man-expect]: http://linux.die.net/man/1/expect
 [php-expect]: http://php.net/manual/en/book.expect.php
@@ -91,10 +92,10 @@ $ php -d variables_order=EGPCS vendor/bin/phpunit
 
 ## Platform support
 
-Expect has been written on and tested on Ubuntu systems. While it ought to
-work on all Linux systems and Mac OS, this is not tested. Windows is not
-supported, because the use of `stream_select()` on file descriptors returned by
-`proc_open()` [will fail][php-stream-select] and return `false` under Windows.
+Expect is tested against PHP 5.6, 7.x and HHVM 3.6 on Ubuntu-like systems. It
+should work on common Unixy systems, including Mac OS. Windows is not supported,
+because `stream_select()` on file descriptors returned by `proc_open()`
+[will fail][php-stream-select] under Windows.
 
 [php-stream-select]: http://php.net/manual/en/function.stream-select.php
 
