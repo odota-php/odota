@@ -1,15 +1,11 @@
-Expect ![stability-experimental](https://cloud.githubusercontent.com/assets/1734555/18616629/a740d892-7dbf-11e6-8718-64afa66fac0d.png)
-======================================================================================================================================
+Expect ![stability-experimental](https://cloud.githubusercontent.com/assets/1734555/18616629/a740d892-7dbf-11e6-8718-64afa66fac0d.png) [![Travis build status](https://travis-ci.org/expectphp/expect.svg?branch=develop)](https://travis-ci.org/expectphp/expect)
+======
 
 Programmed dialogue with interactive programs for system testing. Written in
 PHP, it is easily integrated in your testing framework of choice.
 
 [man-expect]: http://linux.die.net/man/1/expect
 [php-expect]: http://php.net/manual/en/book.expect.php
-
-| Branch  | Build status |
-|---------|--------------|
-| develop | [![Travis](https://travis-ci.org/expectphp/expect.svg?branch=develop)](https://travis-ci.org/expectphp/expect) |
 
 --------------------------------------------------------------------------------
 
