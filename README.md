@@ -5,9 +5,6 @@ Programmed dialogue with interactive programs for system testing using PHP 5.6,
 PHP 7.x and HHVM. Written in PHP, it is easily integrated in your testing
 framework of choice.
 
-[man-expect]: http://linux.die.net/man/1/expect
-[php-expect]: http://php.net/manual/en/book.expect.php
-
 --------------------------------------------------------------------------------
 
  * [Installation](#installation)
