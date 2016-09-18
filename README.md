@@ -1,7 +1,7 @@
 Odota ![stability-experimental](https://cloud.githubusercontent.com/assets/1734555/18616629/a740d892-7dbf-11e6-8718-64afa66fac0d.png) [![Travis build status](https://travis-ci.org/odota-php/odota.svg?branch=develop)](https://travis-ci.org/odota-php/odota)
 ===============================================================================================================================================================================================================================================================
 
-**o‧do‧ta** — Imperative form of Finnish **odottaa**: *to wait for, await, expect, anticipate*.
+> **o‧do‧ta** — Imperative form of Finnish **odottaa**: *to wait for, await, expect, anticipate*.
 
 Programmed dialogue with interactive programs for system testing using PHP 5.6,
 PHP 7.x and HHVM. Written in PHP, it is easily integrated in your testing
