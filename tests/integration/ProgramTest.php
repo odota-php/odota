@@ -268,7 +268,7 @@ class ProgramTest extends TestCase
     public function can_answer_multiple_symfony_question()
     {
         spawn(PHP_BINARY . ' ./tests/bin/symfony-question-multiple.php -v')
-            ->timeoutAfter(1)
+            ->timeoutAfter(2)
             ->expectError('Say yes')
             ->expectError(' > ')
             ->sendln('yes')
@@ -282,7 +282,7 @@ class ProgramTest extends TestCase
     public function can_answer_multiple_questions_of_a_symfony_console_application_with_shell_interactive_true()
     {
         spawn(PHP_BINARY . ' ./tests/bin/symfony-console-application.php interview -v', null, ['SHELL_INTERACTIVE' => 'true'])
-            ->timeoutAfter(1)
+            ->timeoutAfter(2)
             ->expectError('Say yes')
             ->expectError(' > ')
             ->sendln('yes')
