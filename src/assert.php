@@ -63,18 +63,6 @@ function assertInteger($value, $message)
 }
 
 /**
- * @param array $environmentVariables
- * @throws InvalidArgumentException
- */
-function assertArrayOfEnvironmentVariables($environmentVariables)
-{
-    foreach ($environmentVariables as $name => $value) {
-        assertNonBlankString($name, 'Environment variable ought to be a non-empty string, got "%s" of type "%s"');
-        assertString($value, 'Environment variable value ought to be a string, got "%s" of type "%s"');
-    }
-}
-
-/**
  * Stringifies any type of value. Copied from beberlei/assert.
  *
  *     Copyright (c) 2011-2013, Benjamin Eberlei

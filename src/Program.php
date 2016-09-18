@@ -63,7 +63,6 @@ final class Program
             $workingDirectory,
             'Working directory ought to be a non-empty string, got "%s" of type "%s"'
         );
-        assertArrayOfEnvironmentVariables($environmentVariables);
 
         $process = proc_open(
             $command,
