@@ -6,7 +6,7 @@ use Expect\Expect\ExpectationTimedOutException;
 use Expect\Expect\InvalidArgumentException;
 use Expect\Expect\UnexpectedExitCodeException;
 use PHPUnit\Framework\TestCase as TestCase;
-use function Expect\Expect\program;
+use function Expect\Expect\spawn;
 
 class ProgramTest extends TestCase
 {
@@ -26,7 +26,7 @@ class ProgramTest extends TestCase
     /** @test */
     public function can_expect_a_string_after_some_sleep()
     {
-        program('sleep 0.100 && echo YAY')
+        spawn('sleep 0.100 && echo YAY')
             ->timeoutAfter(0.200)
             ->expect('YAY');
     }
@@ -35,7 +35,7 @@ class ProgramTest extends TestCase
     public function can_time_out_while_expecting_a_string()
     {
         $this->expectException(ExpectationTimedOutException::class);
-        program('sleep 0.100 && echo YAY')
+        spawn('sleep 0.100 && echo YAY')
             ->timeoutAfter(0.050)
             ->expect('YAY');
     }
@@ -43,14 +43,14 @@ class ProgramTest extends TestCase
     /** @test */
     public function can_expect_a_string_in_stderr()
     {
-        program('echo YAY >&2')
+        spawn('echo YAY >&2')
             ->expectError('YAY');
     }
 
     /** @test */
     public function can_respond_to_questions()
     {
-        program('echo -n " > "; read name; echo "Hello, $name!"')
+        spawn('echo -n " > "; read name; echo "Hello, $name!"')
             ->expect(' > ')
             ->sendln('Bob')
             ->expect('Hello, Bob!');
@@ -60,7 +60,7 @@ class ProgramTest extends TestCase
     public function can_time_out_while_expecting_a_string_after_answering_a_question()
     {
         try {
-            program('echo -n " > "; read name; echo "Hello, $name!"')
+            spawn('echo -n " > "; read name; echo "Hello, $name!"')
                 ->expect(' > ')
                 ->sendln('Bob')
                 ->expect('Hello, world!');
@@ -80,7 +80,7 @@ class ProgramTest extends TestCase
     /** @test */
     public function can_answer_multiple_questions()
     {
-        program('echo -n "First name: "; read fname; echo -n " > Last name: "; read lname; echo "Hello, $fname $lname!"')
+        spawn('echo -n "First name: "; read fname; echo -n " > Last name: "; read lname; echo "Hello, $fname $lname!"')
             ->expect('First name:')
             ->sendln('Bob')
             ->expect('Last name:')
@@ -92,7 +92,7 @@ class ProgramTest extends TestCase
     /** @test */
     public function can_expect_a_string_in_two_parts_even_though_its_all_in_the_buffer_already()
     {
-        program('echo AZ')
+        spawn('echo AZ')
             ->expect('A')
             ->expect('Z');
     }
@@ -100,7 +100,7 @@ class ProgramTest extends TestCase
     /** @test */
     public function assert_program_exits_successfully()
     {
-        program('echo AZ')
+        spawn('echo AZ')
             ->expect('A')
             ->expectExitCode(0);
     }
@@ -111,7 +111,7 @@ class ProgramTest extends TestCase
         $this->expectException(UnexpectedExitCodeException::class);
         $this->expectExceptionMessage('Expected program to exit with exit code 0, got exit code 1');
 
-        program('exit 1')
+        spawn('exit 1')
             ->expectExitCode(0);
     }
 
@@ -121,7 +121,7 @@ class ProgramTest extends TestCase
         $start = microtime(true);
 
         try {
-            program('sleep 1')
+            spawn('sleep 1')
                 ->timeoutAfter(0.100)
                 ->expectExitCode(0);
             $this->fail('Program shouldn\'t have exited within 100 milliseconds');
@@ -147,7 +147,7 @@ class ProgramTest extends TestCase
     /** @test */
     public function assert_program_exits_with_an_nonzero_exit_code()
     {
-        program('exit 1')
+        spawn('exit 1')
             ->expectExitCode(1);
     }
 
@@ -157,14 +157,14 @@ class ProgramTest extends TestCase
         $this->expectException(UnexpectedExitCodeException::class);
         $this->expectExceptionMessage('Expected program to exit with exit code 2, got exit code 0');
 
-        program('echo OK')
+        spawn('echo OK')
             ->expectExitCode(2);
     }
 
     /** @test */
     public function assert_program_exits_with_a_certain_exit_code()
     {
-        program('exit 2')
+        spawn('exit 2')
             ->expectExitCode(2);
     }
 
@@ -174,14 +174,14 @@ class ProgramTest extends TestCase
         $this->expectException(UnexpectedExitCodeException::class);
         $this->expectExceptionMessage('Expected program to exit with exit code 2, got exit code 1');
 
-        program('exit 1')
+        spawn('exit 1')
             ->expectExitCode(2);
     }
 
     /** @test */
     public function handles_expectations_on_different_streams_after_each_other()
     {
-        program('echo A; echo B >&2; echo C')
+        spawn('echo A; echo B >&2; echo C')
             ->expect('A')
             ->expectError('B')
             ->expect('C');
@@ -190,7 +190,7 @@ class ProgramTest extends TestCase
     /** @test */
     public function allows_expecting_from_stdout_and_stderr_out_of_order()
     {
-        program('echo AC; echo B >&2')
+        spawn('echo AC; echo B >&2')
             ->expect('A')
             ->expectError('B')
             ->expect('C');
@@ -201,7 +201,7 @@ class ProgramTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('greater than zero');
-        program('echo OK')
+        spawn('echo OK')
             ->timeoutAfter(0);
     }
 
@@ -210,7 +210,7 @@ class ProgramTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('greater than zero');
-        program('echo OK')
+        spawn('echo OK')
             ->timeoutAfter(-1);
     }
 
@@ -218,7 +218,7 @@ class ProgramTest extends TestCase
     public function timed_out_exception_contains_string_that_remains_in_buffer()
     {
         try {
-            program('echo -n NAY')
+            spawn('echo -n NAY')
                 ->timeoutAfter(0.050)
                 ->expect('YAY');
         } catch (ExpectationTimedOutException $e) {
@@ -230,7 +230,7 @@ class ProgramTest extends TestCase
     public function when_program_exits_after_having_output_an_expected_string_on_stdout_stderr_is_also_read_and_available_in_the_exceptions_stderr_buffer()
     {
         try {
-            program('echo -n A; echo -n B >&2')
+            spawn('echo -n A; echo -n B >&2')
                 ->expect('A')
                 ->expectExitCode(0);
         } catch (ExpectationTimedOutException $e) {
@@ -243,7 +243,7 @@ class ProgramTest extends TestCase
     public function when_a_program_exits_while_expecting_a_string_on_stdout_stderr_is_still_read_and_available_in_the_exceptions_stderr_buffer()
     {
         try {
-            program('echo -n A; echo -n Z >&2')
+            spawn('echo -n A; echo -n Z >&2')
                 ->expect('A')
                 ->expect('B');
         } catch (ExpectationTimedOutException $e) {
@@ -255,7 +255,7 @@ class ProgramTest extends TestCase
     /** @test */
     public function can_answer_single_symfony_question()
     {
-        program(PHP_BINARY . ' ./tests/bin/symfony-question-single.php -v')
+        spawn(PHP_BINARY . ' ./tests/bin/symfony-question-single.php -v')
             ->timeoutAfter(1)
             ->expectError('Say yes')
             ->expectError(' > ')
@@ -266,7 +266,7 @@ class ProgramTest extends TestCase
     /** @test */
     public function can_answer_multiple_symfony_question()
     {
-        program(PHP_BINARY . ' ./tests/bin/symfony-question-multiple.php -v')
+        spawn(PHP_BINARY . ' ./tests/bin/symfony-question-multiple.php -v')
             ->timeoutAfter(1)
             ->expectError('Say yes')
             ->expectError(' > ')
@@ -280,7 +280,7 @@ class ProgramTest extends TestCase
     /** @test */
     public function can_answer_multiple_questions_of_a_symfony_console_application_with_shell_interactive_true()
     {
-        program(PHP_BINARY . ' ./tests/bin/symfony-console-application.php interview -v', null, ['SHELL_INTERACTIVE' => 'true'])
+        spawn(PHP_BINARY . ' ./tests/bin/symfony-console-application.php interview -v', null, ['SHELL_INTERACTIVE' => 'true'])
             ->timeoutAfter(1)
             ->expectError('Say yes')
             ->expectError(' > ')

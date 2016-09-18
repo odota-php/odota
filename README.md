@@ -33,7 +33,7 @@ Examples explain it all.
 use function Expect\Expect\program;
 
 // Programmed dialogue with an interactive program.
-program('echo -n " > "; read name; sleep 2; echo "Hello, $name!"')
+spawn('echo -n " > "; read name; sleep 2; echo "Hello, $name!"')
     ->expect(' > ')
     ->sendln('Bob')
     ->timeoutAfter(3)
@@ -41,17 +41,17 @@ program('echo -n " > "; read name; sleep 2; echo "Hello, $name!"')
     ->expectExitCode(0);
 
 // Expectation time-outs default to 100ms, but can be adjusted.
-program('sleep 2; echo OK')
+spawn('sleep 2; echo OK')
     ->timeoutAfter(1)
     ->expect('OK');
 // Expect\Expect\ExpectationTimedOutException
 
 // Expect programs to fail.
-program('test -e non-existent-file')
+spawn('test -e non-existent-file')
     ->expectExitCode(1);
 
 // Expect output on standard error
-program('echo LOG >&2')
+spawn('echo LOG >&2')
     ->expectError('LOG');
 ```
 
