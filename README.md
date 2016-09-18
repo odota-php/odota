@@ -94,7 +94,7 @@ should work on common Unixy systems, including Mac OS. Windows is not supported,
 because `stream_select()` on file descriptors returned by `proc_open()`
 [will fail][php-stream-select] under Windows.
 
-[php-stream-select]: http://php.net/manual/en/function.stream-select.php
+[php-stream-select]: http://php.net/manual/en/function.stream-select.php "Documentation for the PHP function `stream_select()` (php.net)"
 
 ## Why...
 
@@ -115,8 +115,8 @@ closer to the “production” state of your application, namely as a PHP script
 called from the shell. The difference is even greater when you package your
 application as a [Phar][php-phar].
 
-[nat-pryce-system]: http://www.natpryce.com/articles/000772.html
-[php-phar]: http://php.net/manual/en/book.phar.php
+[nat-pryce-system]: http://www.natpryce.com/articles/000772.html "Nat Pryce on System Tests (natpryce.com)"
+[php-phar]: http://php.net/manual/en/book.phar.php "Documentation about PHP Archives (php.net)"
 
 ### ... create a PHP library when there are tools like `expect` and `empty`?
 
