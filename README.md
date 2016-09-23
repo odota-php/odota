@@ -102,9 +102,9 @@ because `stream_select()` on file descriptors returned by `proc_open()`
 ### ... not test against the PHP CLI application in user-land?
 
 A simpler way of testing PHP CLI applications would be to boot the application
-in the same execution context as the test, like Symfony
-[helps you do][sf-cli-testing]. There are a couple of reasons for testing
-against the final executable. Let's start with a remark by Nat Price:
+in the same execution context as the test, and, perhaps, mock the unit that
+abstracts interactivity like asking questions. There are a couple of reasons for
+testing against the final executable. Let's start with a remark by Nat Price:
 
 > System tests exercise the entire system end-to-end, driving the system through
 > its published remote interfaces and user interface. They also exercise the
